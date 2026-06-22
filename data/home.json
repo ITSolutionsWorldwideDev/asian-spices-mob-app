@@ -1,0 +1,358 @@
+{
+  "hero": {
+    "title": "Welcome to Asian Spices",
+    "subtitle": "Authentic flavors from across Asia",
+    "promo": "30% OFF on Selected Items",
+    "image": "https://images.unsplash.com/photo-1596040033229-a9821ebd058d?w=800&q=80"
+  },
+  "categories": [
+    { "id": "1", "name": "Spices", "icon": "flame-outline", "routeId": "1" },
+    { "id": "2", "name": "Spice Blends", "icon": "color-palette-outline", "routeId": "4" },
+    { "id": "3", "name": "Herbs", "icon": "leaf-outline", "routeId": "2" },
+    { "id": "4", "name": "Beverages", "icon": "cafe-outline", "routeId": "3" },
+    { "id": "5", "name": "Rice & Grains", "icon": "nutrition-outline", "routeId": "3" },
+    { "id": "6", "name": "Oils", "icon": "water-outline", "routeId": "6" },
+    { "id": "7", "name": "Condiments", "icon": "beaker-outline", "routeId": "7" },
+    { "id": "8", "name": "Kitchen Tools", "icon": "restaurant-outline", "routeId": "8" }
+  ],
+  "reels": [
+    {
+      "id": "r1",
+      "title": "Butter Biryani",
+      "chefName": "Chef Priya",
+      "chefAvatar": "https://i.pravatar.cc/100?img=47",
+      "thumbnail": "https://images.unsplash.com/photo-1563379091339-03b21ab4a4f8?w=400&q=80",
+      "duration": "2:45",
+      "views": "45.2K",
+      "likes": "12.5K"
+    },
+    {
+      "id": "r2",
+      "title": "Spicy Samosas",
+      "chefName": "Chef Arjun",
+      "chefAvatar": "https://i.pravatar.cc/100?img=33",
+      "thumbnail": "https://images.unsplash.com/photo-1601050690597-df0568f70950?w=400&q=80",
+      "duration": "1:30",
+      "views": "32.1K",
+      "likes": "8.4K"
+    },
+    {
+      "id": "r3",
+      "title": "Paneer Tikka",
+      "chefName": "Chef Meera",
+      "chefAvatar": "https://i.pravatar.cc/100?img=25",
+      "thumbnail": "https://images.unsplash.com/photo-1596797038530-2c107229654b?w=400&q=80",
+      "duration": "3:10",
+      "views": "28.7K",
+      "likes": "9.2K"
+    }
+  ],
+  "topProducts": [
+    {
+      "id": "tp1",
+      "name": "Organic Turmeric",
+      "image": "https://images.unsplash.com/photo-1596040033229-a9821ebd058d?w=400&q=80",
+      "rating": 4.8,
+      "reviewCount": 234,
+      "price": 8.99,
+      "originalPrice": 12.99,
+      "discount": 30
+    },
+    {
+      "id": "tp2",
+      "name": "Red Chili Powder",
+      "image": "https://images.unsplash.com/photo-1596040033229-a9821ebd058d?w=400&q=80",
+      "rating": 4.6,
+      "reviewCount": 189,
+      "price": 6.99,
+      "originalPrice": 9.99,
+      "discount": 25
+    },
+    {
+      "id": "tp3",
+      "name": "Ceylon Cinnamon Sticks",
+      "image": "https://images.unsplash.com/photo-1508747703725-719777637510?w=400&q=80",
+      "rating": 4.9,
+      "reviewCount": 156,
+      "price": 11.99
+    },
+    {
+      "id": "tp4",
+      "name": "Green Cardamom Pods",
+      "image": "https://images.unsplash.com/photo-1509440159596-0249088772ff?w=400&q=80",
+      "rating": 4.7,
+      "reviewCount": 112,
+      "price": 14.99,
+      "originalPrice": 18.99,
+      "discount": 20
+    }
+  ],
+  "newArrivals": [
+    {
+      "id": "na1",
+      "name": "Turmeric Curcumin",
+      "image": "https://images.unsplash.com/photo-1596040033229-a9821ebd058d?w=400&q=80",
+      "rating": 4.8,
+      "reviewCount": 487,
+      "price": 24.99,
+      "originalPrice": 32.99,
+      "discount": 24,
+      "isNew": true
+    },
+    {
+      "id": "na2",
+      "name": "Ashwagandha Root Capsules",
+      "image": "https://images.unsplash.com/photo-1556228578-0d85b1a4d571?w=400&q=80",
+      "rating": 4.7,
+      "reviewCount": 352,
+      "price": 19.99,
+      "originalPrice": 26.99,
+      "discount": 26,
+      "isNew": true
+    },
+    {
+      "id": "na3",
+      "name": "Spirulina Powder",
+      "image": "https://images.unsplash.com/photo-1596040033229-a9821ebd058d?w=400&q=80",
+      "rating": 4.7,
+      "reviewCount": 421,
+      "price": 27.99,
+      "isNew": true
+    },
+    {
+      "id": "na4",
+      "name": "Chamomile Herbal Tea",
+      "image": "https://images.unsplash.com/photo-1564890369478-c89ca6d9cde9?w=400&q=80",
+      "rating": 4.8,
+      "reviewCount": 543,
+      "price": 14.99,
+      "isNew": true
+    },
+    {
+      "id": "na5",
+      "name": "Green Tea with Tulsi",
+      "image": "https://images.unsplash.com/photo-1556679343-c7306c1976bc?w=400&q=80",
+      "rating": 4.7,
+      "reviewCount": 389,
+      "price": 16.99,
+      "originalPrice": 21.99,
+      "discount": 23,
+      "isNew": true
+    },
+    {
+      "id": "na6",
+      "name": "Rosehip Face Oil",
+      "image": "https://images.unsplash.com/photo-1608248543803-ba4f8c70ae0b?w=400&q=80",
+      "rating": 4.9,
+      "reviewCount": 612,
+      "price": 29.99,
+      "isNew": true
+    }
+  ],
+  "herbalProducts": [
+    {
+      "id": "hp1",
+      "name": "Turmeric Curcumin",
+      "image": "https://images.unsplash.com/photo-1596040033229-a9821ebd058d?w=400&q=80",
+      "rating": 4.8,
+      "reviewCount": 487,
+      "price": 24.99,
+      "originalPrice": 32.99,
+      "discount": 24
+    },
+    {
+      "id": "hp2",
+      "name": "Ashwagandha Root Capsules",
+      "image": "https://images.unsplash.com/photo-1556228578-0d85b1a4d571?w=400&q=80",
+      "rating": 4.7,
+      "reviewCount": 352,
+      "price": 19.99,
+      "originalPrice": 26.99,
+      "discount": 26
+    },
+    {
+      "id": "hp3",
+      "name": "Spirulina Powder",
+      "image": "https://images.unsplash.com/photo-1596040033229-a9821ebd058d?w=400&q=80",
+      "rating": 4.7,
+      "reviewCount": 421,
+      "price": 27.99
+    },
+    {
+      "id": "hp4",
+      "name": "Chamomile Herbal Tea",
+      "image": "https://images.unsplash.com/photo-1564890369478-c89ca6d9cde9?w=400&q=80",
+      "rating": 4.8,
+      "reviewCount": 543,
+      "price": 14.99
+    }
+  ],
+  "kitchenAppliances": [
+    {
+      "id": "ka1",
+      "name": "Electric Spice Grinder Pro",
+      "brand": "SpiceMaster",
+      "image": "https://images.unsplash.com/photo-1556911220-bff31c812dba?w=400&q=80",
+      "rating": 4.7,
+      "reviewCount": 342,
+      "price": 49.99,
+      "originalPrice": 69.99,
+      "discount": 29
+    },
+    {
+      "id": "ka2",
+      "name": "Manual Spice Mill",
+      "brand": "Heritage Kitchen",
+      "image": "https://images.unsplash.com/photo-1556911220-bff31c812dba?w=400&q=80",
+      "rating": 4.5,
+      "reviewCount": 156,
+      "price": 24.99
+    },
+    {
+      "id": "ka3",
+      "name": "Commercial Spice Grinder",
+      "brand": "ChefPro",
+      "image": "https://images.unsplash.com/photo-1556911220-bff31c812dba?w=400&q=80",
+      "rating": 4.9,
+      "reviewCount": 89,
+      "price": 89.99
+    },
+    {
+      "id": "ka4",
+      "name": "Granite Mortar & Pestle Set",
+      "brand": "StoneKraft",
+      "image": "https://images.unsplash.com/photo-1556911220-bff31c812dba?w=400&q=80",
+      "rating": 4.8,
+      "reviewCount": 267,
+      "price": 34.99,
+      "originalPrice": 44.99,
+      "discount": 22
+    },
+    {
+      "id": "ka5",
+      "name": "Marble Mortar & Pestle",
+      "brand": "Artisan Home",
+      "image": "https://images.unsplash.com/photo-1556911220-bff31c812dba?w=400&q=80",
+      "rating": 4.6,
+      "reviewCount": 198,
+      "price": 28.99
+    },
+    {
+      "id": "ka6",
+      "name": "Wooden Mortar & Pestle",
+      "brand": "EcoWood",
+      "image": "https://images.unsplash.com/photo-1556911220-bff31c812dba?w=400&q=80",
+      "rating": 4.4,
+      "reviewCount": 134,
+      "price": 18.99
+    }
+  ],
+  "featuredRecipes": [
+    {
+      "id": "fr1",
+      "title": "Spicy Samosas",
+      "image": "https://images.unsplash.com/photo-1601050690597-df0568f70950?w=400&q=80",
+      "time": "55min",
+      "difficulty": "Medium",
+      "rating": 4.8,
+      "reviews": 542,
+      "servings": 12,
+      "price": 14.99
+    },
+    {
+      "id": "fr2",
+      "title": "Paneer Tikka",
+      "image": "https://images.unsplash.com/photo-1596797038530-2c107229654b?w=400&q=80",
+      "time": "35min",
+      "difficulty": "Easy",
+      "rating": 4.9,
+      "reviews": 678,
+      "servings": 4,
+      "price": 16.99
+    },
+    {
+      "id": "fr3",
+      "title": "Butter Biryani",
+      "image": "https://images.unsplash.com/photo-1563379091339-03b21ab4a4f8?w=400&q=80",
+      "time": "60min",
+      "difficulty": "Medium",
+      "rating": 4.9,
+      "reviews": 891,
+      "servings": 6,
+      "price": 18.99
+    },
+    {
+      "id": "fr4",
+      "title": "Masala Chai",
+      "image": "https://images.unsplash.com/photo-1556679343-c7306c1976bc?w=400&q=80",
+      "time": "15min",
+      "difficulty": "Easy",
+      "rating": 4.7,
+      "reviews": 423,
+      "servings": 2,
+      "price": 9.99
+    }
+  ],
+  "specialDiscounts": [
+    {
+      "id": "sd1",
+      "name": "Organic Turmeric",
+      "image": "https://images.unsplash.com/photo-1596040033229-a9821ebd058d?w=400&q=80",
+      "rating": 4.8,
+      "reviewCount": 234,
+      "price": 8.99,
+      "originalPrice": 12.99,
+      "discount": 30
+    },
+    {
+      "id": "sd2",
+      "name": "Red Chili Powder",
+      "image": "https://images.unsplash.com/photo-1596040033229-a9821ebd058d?w=400&q=80",
+      "rating": 4.6,
+      "reviewCount": 189,
+      "price": 6.99,
+      "originalPrice": 9.99,
+      "discount": 25
+    },
+    {
+      "id": "sd3",
+      "name": "Green Cardamom Pods",
+      "image": "https://images.unsplash.com/photo-1509440159596-0249088772ff?w=400&q=80",
+      "rating": 4.7,
+      "reviewCount": 112,
+      "price": 14.99,
+      "originalPrice": 18.99,
+      "discount": 20
+    },
+    {
+      "id": "sd4",
+      "name": "Garam Masala",
+      "image": "https://images.unsplash.com/photo-1596040033229-a9821ebd058d?w=400&q=80",
+      "rating": 4.8,
+      "reviewCount": 267,
+      "price": 9.99,
+      "originalPrice": 13.99,
+      "discount": 28
+    },
+    {
+      "id": "sd5",
+      "name": "Kashmiri Chili Powder",
+      "image": "https://images.unsplash.com/photo-1596040033229-a9821ebd058d?w=400&q=80",
+      "rating": 4.9,
+      "reviewCount": 198,
+      "price": 8.99,
+      "originalPrice": 11.99,
+      "discount": 25
+    },
+    {
+      "id": "sd6",
+      "name": "Saffron Threads",
+      "image": "https://images.unsplash.com/photo-1596040033229-a9821ebd058d?w=400&q=80",
+      "rating": 5,
+      "reviewCount": 87,
+      "price": 24.99,
+      "originalPrice": 29.99,
+      "discount": 17
+    }
+  ]
+}

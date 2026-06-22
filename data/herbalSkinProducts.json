@@ -1,0 +1,49 @@
+{
+  "title": "Herbal Skin Products",
+  "subtitle": "Natural care for radiant skin",
+  "introDescription": "Explore our range of herbal skin care products formulated with natural ingredients. From nourishing oils to gentle cleansers, find everything for healthy, glowing skin.",
+  "categoriesSectionTitle": "Product Categories",
+  "categoryRoute": "/herbal-skin-products",
+  "theme": {
+    "headerGradient": ["#FF9800", "#E53935"],
+    "screenBackgroundColor": "#FFFFFF",
+    "introBackgroundColor": "#FFFFFF",
+    "qualityBannerBackground": "#FCE4EC",
+    "loadingColor": "#FF9800"
+  },
+  "categories": [
+    {
+      "id": "face-oils",
+      "title": "Face Oils",
+      "description": "Nourishing natural oils for radiant skin",
+      "productCount": 2,
+      "icon": "water-outline",
+      "iconColor": "#FF9800",
+      "backgroundColor": "#FFF8E1"
+    },
+    {
+      "id": "creams",
+      "title": "Creams",
+      "description": "Herbal creams for moisturizing and protection",
+      "productCount": 2,
+      "icon": "sparkles-outline",
+      "iconColor": "#E91E63",
+      "backgroundColor": "#FCE4EC"
+    },
+    {
+      "id": "cleansers",
+      "title": "Cleansers",
+      "description": "Gentle herbal cleansers for all skin types",
+      "productCount": 2,
+      "icon": "rainy-outline",
+      "iconColor": "#2196F3",
+      "backgroundColor": "#E3F2FD"
+    }
+  ],
+  "qualityBanner": {
+    "title": "Natural Beauty",
+    "description": "Our herbal skin care products are crafted with carefully selected natural ingredients. Free from harmful chemicals, they work gently yet effectively to nourish and protect your skin.",
+    "icon": "flower-outline",
+    "iconColor": "#E91E63"
+  }
+}

@@ -1,0 +1,46 @@
+{
+  "title": "Health Benefits of Herbs",
+  "subtitle": "Natural wellness for a healthier you",
+  "introTitle": "Discover Natural Healing",
+  "introDescription": "Herbs have been used for centuries to support wellness, boost immunity, and promote balance in everyday life. Explore how nature's remedies can help you feel your best.",
+  "theme": {
+    "headerGradient": ["#1B5E20", "#4CAF50"],
+    "introBackgroundColor": "#F0F9F4",
+    "screenBackgroundColor": "#F5F5F5",
+    "loadingColor": "#4CAF50"
+  },
+  "benefits": [
+    {
+      "id": "immunity",
+      "title": "Supports Immunity",
+      "description": "Many herbs like turmeric, ginger, and holy basil help strengthen your body's natural defenses.",
+      "icon": "shield-checkmark-outline",
+      "iconColor": "#4CAF50",
+      "backgroundColor": "#E8F5E9"
+    },
+    {
+      "id": "digestion",
+      "title": "Aids Digestion",
+      "description": "Herbs such as fennel, peppermint, and cumin soothe the stomach and support healthy digestion.",
+      "icon": "pulse-outline",
+      "iconColor": "#FF9800",
+      "backgroundColor": "#FFF3E0"
+    },
+    {
+      "id": "relaxation",
+      "title": "Promotes Relaxation",
+      "description": "Chamomile, lavender, and ashwagandha help calm the mind and reduce everyday stress.",
+      "icon": "heart-outline",
+      "iconColor": "#9C27B0",
+      "backgroundColor": "#F3E5F5"
+    },
+    {
+      "id": "energy",
+      "title": "Enhances Energy Levels",
+      "description": "Adaptogenic herbs like ginseng and maca naturally boost vitality and mental clarity.",
+      "icon": "flash-outline",
+      "iconColor": "#FBC02D",
+      "backgroundColor": "#FFFDE7"
+    }
+  ]
+}

@@ -1,0 +1,49 @@
+{
+  "title": "Herbal Hair Products",
+  "subtitle": "Natural solutions for healthy hair",
+  "introDescription": "Transform your hair care routine with our herbal hair products. From nourishing oils to revitalizing masks, discover natural solutions for strong, lustrous hair.",
+  "categoriesSectionTitle": "Product Categories",
+  "categoryRoute": "/herbal-hair-products",
+  "theme": {
+    "headerGradient": ["#FF9800", "#E53935"],
+    "screenBackgroundColor": "#FFFFFF",
+    "introBackgroundColor": "#FFFFFF",
+    "qualityBannerBackground": "#EDE7F6",
+    "loadingColor": "#FF9800"
+  },
+  "categories": [
+    {
+      "id": "hair-oils",
+      "title": "Hair Oils",
+      "description": "Nourishing oils for strong and healthy hair",
+      "productCount": 2,
+      "icon": "water-outline",
+      "iconColor": "#FF9800",
+      "backgroundColor": "#FFF8E1"
+    },
+    {
+      "id": "shampoos",
+      "title": "Shampoos",
+      "description": "Gentle herbal shampoos for all hair types",
+      "productCount": 2,
+      "icon": "sparkles-outline",
+      "iconColor": "#2196F3",
+      "backgroundColor": "#E3F2FD"
+    },
+    {
+      "id": "hair-masks",
+      "title": "Hair Masks",
+      "description": "Deep conditioning treatments for lustrous hair",
+      "productCount": 2,
+      "icon": "heart-outline",
+      "iconColor": "#9C27B0",
+      "backgroundColor": "#F3E5F5"
+    }
+  ],
+  "qualityBanner": {
+    "title": "Traditional Hair Care 💇‍♀️",
+    "description": "Our herbal hair products draw from ancient Ayurvedic traditions, combining time-tested herbs and oils to strengthen, nourish, and restore your hair naturally.",
+    "icon": "leaf-outline",
+    "iconColor": "#7E57C2"
+  }
+}

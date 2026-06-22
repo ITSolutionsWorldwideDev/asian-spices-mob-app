@@ -1,0 +1,81 @@
+{
+  "theme": {
+    "headerGradient": ["#FF9800", "#E53935"],
+    "screenBackgroundColor": "#F5F5F5",
+    "loadingColor": "#FF9800"
+  },
+  "categories": {
+    "hair-oils": {
+      "id": "hair-oils",
+      "title": "Hair Oils",
+      "products": [
+        {
+          "id": "hair-coconut-oil",
+          "name": "Coconut & Amla Hair Oil",
+          "image": "https://images.unsplash.com/photo-1608571423902-eed4a5ad8108?w=400&q=80",
+          "rating": 4.8,
+          "reviewCount": 521,
+          "price": 19.99,
+          "description": "Blend of coconut and amla oils to strengthen roots and add natural shine."
+        },
+        {
+          "id": "hair-bhringraj-oil",
+          "name": "Bhringraj Herbal Hair Oil",
+          "image": "https://images.unsplash.com/photo-1596755389378-c31d21fd1273?w=400&q=80",
+          "rating": 4.9,
+          "reviewCount": 438,
+          "price": 22.99,
+          "description": "Traditional bhringraj oil to promote growth and reduce hair fall."
+        }
+      ]
+    },
+    "shampoos": {
+      "id": "shampoos",
+      "title": "Shampoos",
+      "products": [
+        {
+          "id": "hair-neem-shampoo",
+          "name": "Neem & Tulsi Shampoo",
+          "image": "https://images.unsplash.com/photo-1556228578-0d85b1a4d571?w=400&q=80",
+          "rating": 4.7,
+          "reviewCount": 367,
+          "price": 16.99,
+          "description": "Gentle herbal shampoo with neem and tulsi for a healthy scalp."
+        },
+        {
+          "id": "hair-hibiscus-shampoo",
+          "name": "Hibiscus Revive Shampoo",
+          "image": "https://images.unsplash.com/photo-1556228578-0d85b1a4d571?w=400&q=80",
+          "rating": 4.6,
+          "reviewCount": 312,
+          "price": 17.99,
+          "description": "Hibiscus-enriched formula to cleanse and revitalize dull hair."
+        }
+      ]
+    },
+    "hair-masks": {
+      "id": "hair-masks",
+      "title": "Hair Masks",
+      "products": [
+        {
+          "id": "hair-henna-mask",
+          "name": "Henna & Brahmi Hair Mask",
+          "image": "https://images.unsplash.com/photo-1522338242992-e1a54906a8da?w=400&q=80",
+          "rating": 4.8,
+          "reviewCount": 289,
+          "price": 24.99,
+          "description": "Deep conditioning mask with henna and brahmi for lustrous, thick hair."
+        },
+        {
+          "id": "hair-avocado-mask",
+          "name": "Avocado Repair Hair Mask",
+          "image": "https://images.unsplash.com/photo-1556228720-195a672e8a03?w=400&q=80",
+          "rating": 4.7,
+          "reviewCount": 256,
+          "price": 23.99,
+          "description": "Rich avocado and shea butter mask to repair dryness and split ends."
+        }
+      ]
+    }
+  }
+}

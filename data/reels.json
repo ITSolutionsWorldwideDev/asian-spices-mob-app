@@ -1,0 +1,49 @@
+{
+  "reels": [
+    {
+      "id": "r1",
+      "username": "@Chef Priya",
+      "userAvatar": "https://i.pravatar.cc/100?img=47",
+      "videoUri": "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerBlazes.mp4",
+      "thumbnailUri": "https://images.unsplash.com/photo-1563379091339-03b21ab4a4f8?w=800&q=80",
+      "title": "Butter Chicken",
+      "description": "Learn how to make authentic butter chicken with aromatic spices! 🍗✨",
+      "category": "Spices",
+      "likes": 12500,
+      "comments": 342,
+      "views": "45.2K",
+      "duration": "2:45",
+      "shopCount": 3
+    },
+    {
+      "id": "r2",
+      "username": "@Chef Arjun",
+      "userAvatar": "https://i.pravatar.cc/100?img=33",
+      "videoUri": "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerEscapes.mp4",
+      "thumbnailUri": "https://images.unsplash.com/photo-1601050690597-df0568f70950?w=800&q=80",
+      "title": "Spicy Samosas",
+      "description": "Crispy samosas with the perfect spice blend 🔥",
+      "category": "Spice Blends",
+      "likes": 8400,
+      "comments": 198,
+      "views": "32.1K",
+      "duration": "1:30",
+      "shopCount": 2
+    },
+    {
+      "id": "r3",
+      "username": "@Chef Meera",
+      "userAvatar": "https://i.pravatar.cc/100?img=25",
+      "videoUri": "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerFun.mp4",
+      "thumbnailUri": "https://images.unsplash.com/photo-1596797038530-2c107229654b?w=800&q=80",
+      "title": "Paneer Tikka",
+      "description": "Smoky paneer tikka with homemade masala 🧀🔥",
+      "category": "Masala Blend",
+      "likes": 9200,
+      "comments": 156,
+      "views": "28.7K",
+      "duration": "3:10",
+      "shopCount": 4
+    }
+  ]
+}

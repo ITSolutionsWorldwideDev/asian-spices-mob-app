@@ -1,0 +1,52 @@
+{
+  "notifications": [
+    {
+      "id": "n1",
+      "type": "order_delivered",
+      "title": "Order Delivered",
+      "description": "Your order #ORD-2024-001 has been delivered successfully",
+      "timeAgo": "2 hours ago",
+      "isRead": false
+    },
+    {
+      "id": "n2",
+      "type": "promotion",
+      "title": "50% Off on Spices!",
+      "description": "Limited time offer on premium spices. Shop now and save big!",
+      "timeAgo": "5 hours ago",
+      "isRead": false
+    },
+    {
+      "id": "n3",
+      "type": "order_shipped",
+      "title": "Order Shipped",
+      "description": "Your order #ORD-2024-002 is on the way",
+      "timeAgo": "1 day ago",
+      "isRead": true
+    },
+    {
+      "id": "n4",
+      "type": "price_drop",
+      "title": "Price Drop Alert",
+      "description": "Ceylon Cinnamon Sticks is now 20% off",
+      "timeAgo": "1 day ago",
+      "isRead": false
+    },
+    {
+      "id": "n5",
+      "type": "review",
+      "title": "Review Reminder",
+      "description": "How was your experience with Organic Turmeric Powder?",
+      "timeAgo": "2 days ago",
+      "isRead": true
+    },
+    {
+      "id": "n6",
+      "type": "recipe",
+      "title": "New Recipe Added",
+      "description": "Check out the latest Biryani recipe with authentic spices",
+      "timeAgo": "3 days ago",
+      "isRead": true
+    }
+  ]
+}

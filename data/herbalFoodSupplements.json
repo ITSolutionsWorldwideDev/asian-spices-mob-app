@@ -1,0 +1,48 @@
+{
+  "title": "Herbal Food Supplements",
+  "subtitle": "Natural nutrition for your wellness",
+  "introDescription": "Discover our premium collection of herbal food supplements designed to support your health naturally. Choose from capsules, powders, and teas to fit your lifestyle.",
+  "categoriesSectionTitle": "Product Categories",
+  "theme": {
+    "headerGradient": ["#FF9800", "#E53935"],
+    "screenBackgroundColor": "#FFFFFF",
+    "introBackgroundColor": "#FFFFFF",
+    "qualityBannerBackground": "#F0F9F4",
+    "loadingColor": "#FF9800"
+  },
+  "categories": [
+    {
+      "id": "capsules",
+      "title": "Capsules",
+      "description": "Easy-to-take herbal supplements in capsule form",
+      "productCount": 24,
+      "icon": "medical-outline",
+      "iconColor": "#2196F3",
+      "backgroundColor": "#E3F2FD"
+    },
+    {
+      "id": "powders",
+      "title": "Powders",
+      "description": "Versatile herbal powders for smoothies and drinks",
+      "productCount": 18,
+      "icon": "water-outline",
+      "iconColor": "#4CAF50",
+      "backgroundColor": "#E8F5E9"
+    },
+    {
+      "id": "teas",
+      "title": "Teas",
+      "description": "Soothing herbal teas for daily wellness",
+      "productCount": 32,
+      "icon": "cafe-outline",
+      "iconColor": "#FF9800",
+      "backgroundColor": "#FFF3E0"
+    }
+  ],
+  "qualityBanner": {
+    "title": "Quality Guaranteed",
+    "description": "All our herbal supplements are sourced from trusted suppliers, tested for purity, and made with the highest quality standards.",
+    "icon": "sparkles",
+    "iconColor": "#FBC02D"
+  }
+}

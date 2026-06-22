@@ -1,0 +1,9 @@
+{
+  "pushEnabled": true,
+  "orderUpdates": true,
+  "recipeReelUpdates": true,
+  "newProducts": true,
+  "priceDrops": true,
+  "restockAlerts": true,
+  "promotionalEmails": false
+}

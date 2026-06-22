@@ -1,0 +1,22 @@
+{
+  "paymentMethods": [
+    {
+      "id": "credit-card",
+      "title": "Credit Card",
+      "subtitle": "Visa ending in 4242",
+      "icon": "card-outline"
+    },
+    {
+      "id": "debit-card",
+      "title": "Debit Card",
+      "subtitle": "Mastercard ending in 8888",
+      "icon": "card-outline"
+    },
+    {
+      "id": "cash-on-delivery",
+      "title": "Cash on Delivery",
+      "subtitle": "Pay when you receive",
+      "icon": "cash-outline"
+    }
+  ]
+}

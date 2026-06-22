@@ -1,0 +1,108 @@
+{
+  "theme": {
+    "headerGradient": ["#FF9800", "#E53935"],
+    "screenBackgroundColor": "#F5F5F5",
+    "loadingColor": "#FF9800"
+  },
+  "categories": {
+    "capsules": {
+      "id": "capsules",
+      "title": "Capsules",
+      "products": [
+        {
+          "id": "na1",
+          "name": "Turmeric Curcumin",
+          "image": "https://images.unsplash.com/photo-1471864190281-a93a3070b6de?w=400&q=80",
+          "rating": 4.8,
+          "reviewCount": 487,
+          "price": 24.99,
+          "description": "Premium turmeric curcumin capsules with black pepper for enhanced absorption."
+        },
+        {
+          "id": "hp2",
+          "name": "Ashwagandha Root Capsules",
+          "image": "https://images.unsplash.com/photo-1556228578-0d85b1a4d571?w=400&q=80",
+          "rating": 4.7,
+          "reviewCount": 352,
+          "price": 19.99,
+          "description": "Organic ashwagandha root extract to support stress relief and vitality."
+        },
+        {
+          "id": "sup-moringa",
+          "name": "Moringa Leaf Capsules",
+          "image": "https://images.unsplash.com/photo-1471864190281-a93a3070b6de?w=400&q=80",
+          "rating": 4.6,
+          "reviewCount": 298,
+          "price": 21.99,
+          "description": "Nutrient-rich moringa leaf capsules packed with vitamins and antioxidants."
+        }
+      ]
+    },
+    "powders": {
+      "id": "powders",
+      "title": "Powders",
+      "products": [
+        {
+          "id": "hp3",
+          "name": "Spirulina Powder",
+          "image": "https://images.unsplash.com/photo-1596040033229-a9821ebd058d?w=400&q=80",
+          "rating": 4.7,
+          "reviewCount": 421,
+          "price": 27.99,
+          "description": "Pure spirulina powder rich in protein, iron, and essential nutrients."
+        },
+        {
+          "id": "sup-matcha",
+          "name": "Matcha Green Powder",
+          "image": "https://images.unsplash.com/photo-1512621776951-a57141f2eefd?w=400&q=80",
+          "rating": 4.8,
+          "reviewCount": 367,
+          "price": 22.99,
+          "description": "Ceremonial grade matcha powder for smoothies, lattes, and baking."
+        },
+        {
+          "id": "sup-ashwagandha-powder",
+          "name": "Ashwagandha Root Powder",
+          "image": "https://images.unsplash.com/photo-1596040033229-a9821ebd058d?w=400&q=80",
+          "rating": 4.5,
+          "reviewCount": 214,
+          "price": 18.99,
+          "description": "Finely ground ashwagandha root powder for teas and wellness drinks."
+        }
+      ]
+    },
+    "teas": {
+      "id": "teas",
+      "title": "Teas",
+      "products": [
+        {
+          "id": "hp4",
+          "name": "Chamomile Herbal Tea",
+          "image": "https://images.unsplash.com/photo-1564890369478-c89ca6d9cde9?w=400&q=80",
+          "rating": 4.8,
+          "reviewCount": 543,
+          "price": 14.99,
+          "description": "Calming chamomile herbal tea blend for relaxation and better sleep."
+        },
+        {
+          "id": "na5",
+          "name": "Green Tea with Tulsi",
+          "image": "https://images.unsplash.com/photo-1556679343-c7306c1976bc?w=400&q=80",
+          "rating": 4.7,
+          "reviewCount": 389,
+          "price": 16.99,
+          "description": "Refreshing green tea infused with holy basil for daily wellness."
+        },
+        {
+          "id": "sup-ginger-tea",
+          "name": "Ginger Turmeric Tea",
+          "image": "https://images.unsplash.com/photo-1544787219-7f47ccb76574?w=400&q=80",
+          "rating": 4.6,
+          "reviewCount": 276,
+          "price": 15.99,
+          "description": "Warming ginger and turmeric tea bags to soothe and energize naturally."
+        }
+      ]
+    }
+  }
+}

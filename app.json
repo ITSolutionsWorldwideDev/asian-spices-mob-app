@@ -4,33 +4,47 @@
     "slug": "asain-spices-mob-app",
     "version": "1.0.0",
     "orientation": "portrait",
-    "icon": "./assets/images/icon.png",
+    "icon": "./assets/images/asian-spices-logo.png",
     "scheme": "asainspicesmobapp",
     "userInterfaceStyle": "automatic",
     "newArchEnabled": true,
+    
     "ios": {
       "supportsTablet": true
     },
     "android": {
       "adaptiveIcon": {
         "backgroundColor": "#E6F4FE",
-        "foregroundImage": "./assets/images/android-icon-foreground.png",
-        "backgroundImage": "./assets/images/android-icon-background.png",
-        "monochromeImage": "./assets/images/android-icon-monochrome.png"
+        "foregroundImage": "./assets/images/asian-spices-logo.png",
+        "backgroundImage": "./assets/images/asian-spices-logo.png",
+        "monochromeImage": "./assets/images/asian-spices-logo.png"
       },
-      "edgeToEdgeEnabled": true,
+      "edgeToEdgeEnabled": false,
       "predictiveBackGestureEnabled": false
+    },
+    "androidNavigationBar": {
+      "barStyle": "dark-content",
+      "enforceContrast": true
     },
     "web": {
       "output": "static",
-      "favicon": "./assets/images/favicon.png"
+      "favicon": "./assets/images/asian-spices-logo.png",
+       "bundler": "metro"
     },
     "plugins": [
       "expo-router",
       [
+        "expo-image-picker",
+        {
+          "photosPermission": "Allow Asian Spices to access your photos to upload recipe reels.",
+          "cameraPermission": "Allow Asian Spices to access your camera to record recipe reels."
+        }
+      ],
+      "expo-video",
+      [
         "expo-splash-screen",
         {
-          "image": "./assets/images/splash-icon.png",
+          "image": "./assets/images/asian-spices-logo.png",
           "imageWidth": 200,
           "resizeMode": "contain",
           "backgroundColor": "#ffffff",

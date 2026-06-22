@@ -1,0 +1,46 @@
+{
+  "healthyLivingItems": [
+    {
+      "id": "1",
+      "title": "Health Benefits of Herbs",
+      "subtitle": "Natural wellness guide",
+      "backgroundColor": "#E8F5E9",
+      "iconColor": "#4CAF50",
+      "icon": "leaf-outline",
+      "route": "/health-benefits-of-herbs"
+    },
+    {
+      "id": "2",
+      "title": "Herbal Food Supplements",
+      "subtitle": "Capsules, powders & teas",
+      "backgroundColor": "#FFFDE7",
+      "iconColor": "#FBC02D",
+      "icon": "flask-outline",
+      "route": "/herbal-food-supplements"
+    },
+    {
+      "id": "3",
+      "title": "Herbal Skin Products",
+      "subtitle": "Face oils, creams & cleansers",
+      "backgroundColor": "#FCE4EC",
+      "iconColor": "#E91E63",
+      "icon": "sparkles-outline",
+      "route": "/herbal-skin-products"
+    },
+    {
+      "id": "4",
+      "title": "Herbal Hair Products",
+      "subtitle": "Hair oils, shampoos & masks",
+      "backgroundColor": "#E3F2FD",
+      "iconColor": "#2196F3",
+      "icon": "water-outline",
+      "route": "/herbal-hair-products"
+    }
+  ],
+  "bottomLinks": [
+    { "id": "wishlist", "label": "Wishlist" },
+    { "id": "orders", "label": "Orders & Shipping" },
+    { "id": "support", "label": "Support" },
+    { "id": "settings", "label": "Settings" }
+  ]
+}

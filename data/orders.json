@@ -1,0 +1,58 @@
+{
+  "orders": [
+    {
+      "id": "sample-1",
+      "orderNumber": "ORD-2024-001",
+      "status": "delivered",
+      "placedAt": "2026-01-22T10:30:00.000Z",
+      "itemCount": 3,
+      "items": [
+        {
+          "productId": "tp1",
+          "name": "Organic Turmeric Powder",
+          "quantity": 2,
+          "unitPrice": 8.99,
+          "image": "https://images.unsplash.com/photo-1596040033229-a9821ebd058d?w=400&q=80"
+        },
+        {
+          "productId": "p-1",
+          "name": "Whole Cloves",
+          "quantity": 1,
+          "unitPrice": 9.99,
+          "image": "https://images.unsplash.com/photo-1508747703725-719777637510?w=400&q=80"
+        }
+      ],
+      "trackingNumber": "TRK1234567890",
+      "estimatedDelivery": "Jan 26, 2026",
+      "deliveryAddress": "123 Main Street, Apt 4B, New York, NY 10001",
+      "total": 27.97
+    },
+    {
+      "id": "sample-2",
+      "orderNumber": "ORD-2024-002",
+      "status": "shipped",
+      "placedAt": "2026-01-22T10:30:00.000Z",
+      "itemCount": 2,
+      "items": [
+        {
+          "productId": "tp2",
+          "name": "Red Chili Powder",
+          "quantity": 1,
+          "unitPrice": 6.99,
+          "image": "https://images.unsplash.com/photo-1596040033229-a9821ebd058d?w=400&q=80"
+        },
+        {
+          "productId": "p-5",
+          "name": "Garam Masala Mix",
+          "quantity": 1,
+          "unitPrice": 7.99,
+          "image": "https://images.unsplash.com/photo-1596040033229-a9821ebd058d?w=400&q=80"
+        }
+      ],
+      "trackingNumber": "TRK0987654321",
+      "estimatedDelivery": "Jan 26, 2026",
+      "deliveryAddress": "123 Main Street, Apt 4B, New York, NY 10001",
+      "total": 14.98
+    }
+  ]
+}

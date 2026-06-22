@@ -1,0 +1,81 @@
+{
+  "theme": {
+    "headerGradient": ["#FF9800", "#E53935"],
+    "screenBackgroundColor": "#F5F5F5",
+    "loadingColor": "#FF9800"
+  },
+  "categories": {
+    "face-oils": {
+      "id": "face-oils",
+      "title": "Face Oils",
+      "products": [
+        {
+          "id": "na6",
+          "name": "Rosehip Face Oil",
+          "image": "https://images.unsplash.com/photo-1608248543803-ba4f8c70ae0b?w=400&q=80",
+          "rating": 4.9,
+          "reviewCount": 612,
+          "price": 29.99,
+          "description": "Cold-pressed rosehip oil rich in vitamins A and C for glowing skin."
+        },
+        {
+          "id": "skin-argan",
+          "name": "Argan Glow Face Oil",
+          "image": "https://images.unsplash.com/photo-1608248543803-ba4f8c70ae0b?w=400&q=80",
+          "rating": 4.8,
+          "reviewCount": 445,
+          "price": 27.99,
+          "description": "Moroccan argan oil blend to hydrate, soften, and restore radiance."
+        }
+      ]
+    },
+    "creams": {
+      "id": "creams",
+      "title": "Creams",
+      "products": [
+        {
+          "id": "skin-aloe-cream",
+          "name": "Aloe Vera Moisture Cream",
+          "image": "https://images.unsplash.com/photo-1556228720-195a672e8a03?w=400&q=80",
+          "rating": 4.7,
+          "reviewCount": 328,
+          "price": 22.99,
+          "description": "Lightweight herbal cream with aloe vera for daily hydration and protection."
+        },
+        {
+          "id": "skin-turmeric-cream",
+          "name": "Turmeric Brightening Cream",
+          "image": "https://images.unsplash.com/photo-1556228578-0d85b1a4d571?w=400&q=80",
+          "rating": 4.6,
+          "reviewCount": 291,
+          "price": 24.99,
+          "description": "Turmeric and sandalwood cream to brighten tone and soothe irritation."
+        }
+      ]
+    },
+    "cleansers": {
+      "id": "cleansers",
+      "title": "Cleansers",
+      "products": [
+        {
+          "id": "skin-neem-cleanser",
+          "name": "Neem Herbal Cleanser",
+          "image": "https://images.unsplash.com/photo-1556228578-0d85b1a4d571?w=400&q=80",
+          "rating": 4.8,
+          "reviewCount": 367,
+          "price": 18.99,
+          "description": "Gentle neem and tea tree cleanser for clear, balanced skin."
+        },
+        {
+          "id": "skin-honey-cleanser",
+          "name": "Honey Oat Gentle Cleanser",
+          "image": "https://images.unsplash.com/photo-1608571423902-eed4a5ad8108?w=400&q=80",
+          "rating": 4.7,
+          "reviewCount": 254,
+          "price": 17.99,
+          "description": "Soothing honey and oat formula that cleanses without stripping moisture."
+        }
+      ]
+    }
+  }
+}

@@ -1,0 +1,74 @@
+{
+  "defaults": {
+    "brand": "Asian Spices",
+    "weight": "100g",
+    "description": "Premium quality spices, carefully sourced and packed for maximum freshness and flavor.",
+    "inStock": true,
+    "reviews": [
+      {
+        "id": "r-default",
+        "author": "Sarah M.",
+        "rating": 5,
+        "text": "Excellent quality! Very fresh and aromatic."
+      }
+    ]
+  },
+  "details": {
+    "p-1": {
+      "weight": "50g",
+      "brand": "Asian Spices",
+      "description": "Aromatic whole cloves with intense flavor. Perfect for biryani, curries, and chai.",
+      "inStock": true,
+      "reviews": [
+        {
+          "id": "r-p1-1",
+          "author": "Sarah M.",
+          "rating": 5,
+          "text": "Excellent quality! Very fresh and aromatic."
+        }
+      ]
+    },
+    "p-2": {
+      "weight": "30g",
+      "description": "Fragrant dried bay leaves ideal for soups, stews, and rice dishes."
+    },
+    "p-3": {
+      "weight": "40g",
+      "description": "Whole nutmeg with warm, sweet flavor. Grate fresh for best results."
+    },
+    "p-4": {
+      "weight": "25g",
+      "description": "Delicate mace blades with a subtle nutmeg-like aroma for rich curries."
+    },
+    "p-5": {
+      "weight": "75g",
+      "description": "Authentic garam masala blend with coriander, cumin, and warming spices."
+    },
+    "p-6": {
+      "weight": "50g",
+      "description": "Fiery bird eye chili for bold heat in sauces and marinades."
+    },
+    "p-7": {
+      "weight": "20g",
+      "description": "Fresh basil leaves with bright aroma for Italian and Asian dishes."
+    },
+    "tp1": {
+      "weight": "200g",
+      "description": "Organic turmeric powder rich in curcumin. Great for golden milk and curries."
+    },
+    "tp2": {
+      "weight": "150g",
+      "description": "Vibrant red chili powder with balanced heat for everyday cooking."
+    },
+    "ka1": {
+      "weight": "1 unit",
+      "brand": "SpiceMaster",
+      "description": "Electric spice grinder with stainless steel blades and adjustable coarseness."
+    },
+    "ka2": {
+      "weight": "1 unit",
+      "brand": "Heritage Kitchen",
+      "description": "Classic manual spice mill for freshly ground spices at the table."
+    }
+  }
+}
