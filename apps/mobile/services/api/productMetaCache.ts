@@ -28,7 +28,8 @@ export function setProductMetaFromApiRow(
   row: { category_id?: string | number | null; base_price?: string | number | null },
 ) {
   setProductMeta(productId, {
-    categoryId: row.category_id ?? null,
+    categoryId:
+      row.category_id != null ? String(row.category_id) : null,
     basePrice: parseBasePrice(row.base_price),
   });
 }

@@ -648,17 +648,19 @@ export async function fetchRecipeReviewList(recipeId: string): Promise<RecipeRev
     }>(`/api/recipes/reviews?recipeId=${encodeURIComponent(recipeId)}&page=1&limit=20`);
 
     const reviews = (response.reviews ?? [])
-      .map((item, index) => {
+      .map((item, index): RecipeReview | null => {
         const text = item.comment?.trim();
         if (!text) return null;
 
         const rating = Number(item.rating ?? 0);
+        const title = item.title?.trim();
+
         return {
           id: String(item.id ?? `review-${index}`),
           author: item.name?.trim() || "Anonymous",
           rating: Number.isFinite(rating) ? Math.max(0, Math.min(5, rating)) : 0,
           text,
-          title: item.title?.trim() || undefined,
+          ...(title ? { title } : {}),
         };
       })
       .filter((review): review is RecipeReview => review !== null);

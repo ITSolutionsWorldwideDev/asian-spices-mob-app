@@ -13,6 +13,10 @@ export type Country = {
   is_shippable?: boolean;
 };
 
+type CountryLookup = Pick<Country, "name"> & {
+  iso2?: string;
+};
+
 export async function fetchCountries(): Promise<Country[]> {
   const rows = await apiRequest<Country[]>("/api/countries?shippable=true");
   return Array.isArray(rows) ? rows : [];
@@ -48,7 +52,7 @@ export function getDefaultCountry(countries: Country[]): Country | null {
 
 export function getCountryDisplayName(
   countryValue: string,
-  countries: Array<Pick<Country, "name" | "iso2">> = [],
+  countries: CountryLookup[] = [],
 ): string {
   const trimmed = countryValue.trim();
   if (!trimmed) return "";
@@ -69,7 +73,7 @@ export function getCountryDisplayName(
 
 export function isCountrySelected(
   countryValue: string,
-  country: Pick<Country, "name" | "iso2">,
+  country: CountryLookup,
 ): boolean {
   const trimmed = countryValue.trim();
   if (!trimmed) return false;

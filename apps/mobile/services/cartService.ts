@@ -29,7 +29,10 @@ function toNumber(value: string | number | null | undefined) {
 /** Fallback when no stored product-page price exists (e.g. server-only cart item). */
 function resolveFallbackUnitPrice(row: ApiCartItemRow, productId: string) {
   const meta = getProductMeta(productId);
-  const categoryId = row.category_id ?? meta?.categoryId ?? null;
+  const categoryId =
+    row.category_id != null
+      ? String(row.category_id)
+      : (meta?.categoryId ?? null);
 
   return resolveProductPricing({
     base_price: row.base_price,
