@@ -1,0 +1,312 @@
+{
+  "pageTitle": "Categories",
+  "pageSubtitle": "Browse our spice collection",
+  "categories": [
+    {
+      "id": "1",
+      "title": "Asian Spices & Seasoning",
+      "emoji": "🌶️",
+      "description": "Whole spices, blends and seasoning mixes",
+      "productCount": 120,
+      "image": "https://images.unsplash.com/photo-1596040033229-a9821ebd058d?w=200&q=80"
+    },
+    {
+      "id": "2",
+      "title": "Asian Foods & Beverages",
+      "emoji": "🍜",
+      "description": "Snacks, sauces, drinks and pantry staples",
+      "productCount": 42,
+      "image": "https://images.unsplash.com/photo-1596040033229-a9821ebd058d?w=200&q=80"
+    },
+    {
+      "id": "3",
+      "title": "Kitchen Appliances & Cooking Tools",
+      "emoji": "🔪",
+      "description": "Grinders, cookware and prep tools",
+      "productCount": 36,
+      "image": "https://images.unsplash.com/photo-1556911220-bff31c812dba?w=200&q=80"
+    }
+  ],
+  "subcategories": {
+    "1": [
+      {
+        "id": "1-1",
+        "title": "Whole Spices",
+        "productCount": 45,
+        "image": "https://images.unsplash.com/photo-1509440159596-0249088772ff?w=400&q=80"
+      },
+      {
+        "id": "1-2",
+        "title": "Ground Spices",
+        "productCount": 38,
+        "image": "https://images.unsplash.com/photo-1596040033229-a9821ebd058d?w=400&q=80"
+      },
+      {
+        "id": "1-3",
+        "title": "Spice Blends",
+        "productCount": 25,
+        "image": "https://images.unsplash.com/photo-1596040033229-a9821ebd058d?w=400&q=80"
+      },
+      {
+        "id": "1-4",
+        "title": "Hot Spices",
+        "productCount": 12,
+        "image": "https://images.unsplash.com/photo-1596040033229-a9821ebd058d?w=400&q=80"
+      }
+    ],
+    "2": [
+      {
+        "id": "2-1",
+        "title": "Fresh Herbs",
+        "productCount": 18,
+        "image": "https://images.unsplash.com/photo-1512621776951-a57141f2eefd?w=400&q=80"
+      },
+      {
+        "id": "2-2",
+        "title": "Dried Herbs",
+        "productCount": 15,
+        "image": "https://images.unsplash.com/photo-1512621776951-a57141f2eefd?w=400&q=80"
+      },
+      {
+        "id": "2-3",
+        "title": "Herbal Leaves",
+        "productCount": 12,
+        "image": "https://images.unsplash.com/photo-1512621776951-a57141f2eefd?w=400&q=80"
+      }
+    ],
+    "3": [
+      {
+        "id": "3-1",
+        "title": "Spice Seeds",
+        "productCount": 20,
+        "image": "https://images.unsplash.com/photo-1509440159596-0249088772ff?w=400&q=80"
+      },
+      {
+        "id": "3-2",
+        "title": "Premium Nuts",
+        "productCount": 10,
+        "image": "https://images.unsplash.com/photo-1509440159596-0249088772ff?w=400&q=80"
+      },
+      {
+        "id": "3-3",
+        "title": "Mixed Seeds",
+        "productCount": 8,
+        "image": "https://images.unsplash.com/photo-1509440159596-0249088772ff?w=400&q=80"
+      }
+    ],
+    "4": [
+      {
+        "id": "4-1",
+        "title": "Garam Masala",
+        "productCount": 14,
+        "image": "https://images.unsplash.com/photo-1596040033229-a9821ebd058d?w=400&q=80"
+      },
+      {
+        "id": "4-2",
+        "title": "Curry Blends",
+        "productCount": 18,
+        "image": "https://images.unsplash.com/photo-1596040033229-a9821ebd058d?w=400&q=80"
+      },
+      {
+        "id": "4-3",
+        "title": "Tandoori Mix",
+        "productCount": 10,
+        "image": "https://images.unsplash.com/photo-1596040033229-a9821ebd058d?w=400&q=80"
+      },
+      {
+        "id": "4-4",
+        "title": "Biryani Masala",
+        "productCount": 10,
+        "image": "https://images.unsplash.com/photo-1596040033229-a9821ebd058d?w=400&q=80"
+      }
+    ],
+    "5": [
+      {
+        "id": "5-1",
+        "title": "Saffron",
+        "productCount": 6,
+        "image": "https://images.unsplash.com/photo-1596040033229-a9821ebd058d?w=400&q=80"
+      },
+      {
+        "id": "5-2",
+        "title": "Truffle Spices",
+        "productCount": 8,
+        "image": "https://images.unsplash.com/photo-1596040033229-a9821ebd058d?w=400&q=80"
+      },
+      {
+        "id": "5-3",
+        "title": "Rare Blends",
+        "productCount": 14,
+        "image": "https://images.unsplash.com/photo-1596040033229-a9821ebd058d?w=400&q=80"
+      }
+    ],
+    "6": [
+      {
+        "id": "6-1",
+        "title": "Organic Spices",
+        "productCount": 28,
+        "image": "https://images.unsplash.com/photo-1508747703725-719777637510?w=400&q=80"
+      },
+      {
+        "id": "6-2",
+        "title": "Organic Herbs",
+        "productCount": 20,
+        "image": "https://images.unsplash.com/photo-1512621776951-a57141f2eefd?w=400&q=80"
+      },
+      {
+        "id": "6-3",
+        "title": "Organic Blends",
+        "productCount": 16,
+        "image": "https://images.unsplash.com/photo-1596040033229-a9821ebd058d?w=400&q=80"
+      }
+    ],
+    "7": [
+      {
+        "id": "7-1",
+        "title": "Sauces & Chutneys",
+        "productCount": 18,
+        "image": "https://images.unsplash.com/photo-1596040033229-a9821ebd058d?w=400&q=80"
+      },
+      {
+        "id": "7-2",
+        "title": "Pickles & Preserves",
+        "productCount": 14,
+        "image": "https://images.unsplash.com/photo-1596040033229-a9821ebd058d?w=400&q=80"
+      },
+      {
+        "id": "7-3",
+        "title": "Vinegars & Dressings",
+        "productCount": 10,
+        "image": "https://images.unsplash.com/photo-1596040033229-a9821ebd058d?w=400&q=80"
+      }
+    ],
+    "8": [
+      {
+        "id": "8-1",
+        "title": "Spice Grinders",
+        "productCount": 12,
+        "image": "https://images.unsplash.com/photo-1556911220-bff31c812dba?w=400&q=80"
+      },
+      {
+        "id": "8-2",
+        "title": "Mortar & Pestle",
+        "productCount": 10,
+        "image": "https://images.unsplash.com/photo-1556911220-bff31c812dba?w=400&q=80"
+      },
+      {
+        "id": "8-3",
+        "title": "Measuring Tools",
+        "productCount": 14,
+        "image": "https://images.unsplash.com/photo-1556911220-bff31c812dba?w=400&q=80"
+      }
+    ]
+  },
+  "products": {
+    "1-1": [
+      {
+        "id": "p-1",
+        "subcategoryId": "1-1",
+        "name": "Whole Cloves",
+        "image": "https://images.unsplash.com/photo-1508747703725-719777637510?w=400&q=80",
+        "rating": 4.7,
+        "reviewCount": 156,
+        "price": 9.99,
+        "originalPrice": 12.99,
+        "discountPercent": 23,
+        "popularityScore": 96
+      },
+      {
+        "id": "p-2",
+        "subcategoryId": "1-1",
+        "name": "Dried Bay Leaves",
+        "image": "https://images.unsplash.com/photo-1508747703725-719777637510?w=400&q=80",
+        "rating": 4.5,
+        "reviewCount": 142,
+        "price": 6.99,
+        "popularityScore": 89
+      },
+      {
+        "id": "p-3",
+        "subcategoryId": "1-1",
+        "name": "Whole Nutmeg",
+        "image": "https://images.unsplash.com/photo-1509440159596-0249088772ff?w=400&q=80",
+        "rating": 4.8,
+        "reviewCount": 98,
+        "price": 12.99,
+        "originalPrice": 15.99,
+        "discountPercent": 19,
+        "popularityScore": 92
+      },
+      {
+        "id": "p-4",
+        "subcategoryId": "1-1",
+        "name": "Mace (Javitri)",
+        "image": "https://images.unsplash.com/photo-1583663848850-46af132dc08e?w=400&q=80",
+        "rating": 4.6,
+        "reviewCount": 78,
+        "price": 15.99,
+        "popularityScore": 87
+      }
+    ],
+    "1-2": [],
+    "1-3": [
+      {
+        "id": "p-5",
+        "subcategoryId": "1-3",
+        "name": "Garam Masala Mix",
+        "image": "https://images.unsplash.com/photo-1596040033229-a9821ebd058d?w=400&q=80",
+        "rating": 4.4,
+        "reviewCount": 54,
+        "price": 7.99,
+        "originalPrice": 9.99,
+        "discountPercent": 20,
+        "popularityScore": 84
+      }
+    ],
+    "1-4": [
+      {
+        "id": "p-6",
+        "subcategoryId": "1-4",
+        "name": "Bird Eye Chili",
+        "image": "https://images.unsplash.com/photo-1583663848850-46af132dc08e?w=400&q=80",
+        "rating": 4.9,
+        "reviewCount": 36,
+        "price": 11.49,
+        "popularityScore": 79
+      }
+    ],
+    "2-1": [
+      {
+        "id": "p-7",
+        "subcategoryId": "2-1",
+        "name": "Fresh Basil Leaves",
+        "image": "https://images.unsplash.com/photo-1512621776951-a57141f2eefd?w=400&q=80",
+        "rating": 4.5,
+        "reviewCount": 44,
+        "price": 4.49,
+        "popularityScore": 72
+      }
+    ],
+    "2-2": [],
+    "2-3": [],
+    "3-1": [],
+    "3-2": [],
+    "3-3": [],
+    "4-1": [],
+    "4-2": [],
+    "4-3": [],
+    "4-4": [],
+    "5-1": [],
+    "5-2": [],
+    "5-3": [],
+    "6-1": [],
+    "6-2": [],
+    "6-3": [],
+    "7-1": [],
+    "7-2": [],
+    "7-3": [],
+    "8-1": [],
+    "8-2": [],
+    "8-3": []
+  }
+}

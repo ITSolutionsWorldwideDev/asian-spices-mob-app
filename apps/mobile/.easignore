@@ -1,0 +1,32 @@
+# EAS Build ignore for mobile (same dir as eas.json)
+# Replaces .gitignore for what gets uploaded to EAS.
+
+# Sibling API app (videos/images make the archive ~600MB)
+../api/
+../../apps/api/
+
+# Dependencies
+node_modules/
+../../node_modules/
+
+# Build / cache
+.expo/
+.metro-health-check*
+dist/
+web-build/
+*.tsbuildinfo
+
+# Env
+.env
+.env.*
+
+# Native / OS
+.kotlin/
+ios/
+android/
+.DS_Store
+
+# Large media
+**/*.mp4
+**/*.mov
+**/*.webm

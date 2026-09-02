@@ -1,0 +1,58 @@
+# EAS Build ignore — keep upload small (replaces .gitignore for uploads)
+
+# Monorepo: exclude API app entirely (backend is on Vercel)
+apps/api/
+**/apps/api/
+
+# Dependencies (EAS installs these on the build server)
+node_modules/
+**/node_modules/
+
+# Build / cache
+.next/
+**/.next/
+.expo/
+**/.expo/
+dist/
+web-build/
+*.tsbuildinfo
+
+# Git / tooling
+.git/
+**/.git/
+.cursor/
+agent-transcripts/
+.claude/
+.vscode/
+*.md
+!apps/mobile/README.md
+
+# Env / secrets
+.env
+.env.*
+**/.env
+**/.env.*
+
+# Native / OS
+.kotlin/
+ios/
+android/
+.DS_Store
+*.pem
+*.jks
+*.p8
+*.p12
+*.key
+*.mobileprovision
+
+# Logs
+npm-debug.*
+yarn-debug.*
+yarn-error.*
+
+# Large media that must not ship in the mobile upload
+**/*.mp4
+**/*.mov
+**/*.avi
+**/*.mkv
+**/*.webm

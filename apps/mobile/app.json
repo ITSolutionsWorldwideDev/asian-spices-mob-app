@@ -1,0 +1,81 @@
+{
+  "expo": {
+    "name": "Asian Spices",
+    "slug": "asain-spices-mob-app",
+    "version": "1.0.0",
+    "orientation": "portrait",
+    "icon": "./assets/images/app-icon.png",
+    "scheme": "asainspicesmobapp",
+    "userInterfaceStyle": "automatic",
+    "newArchEnabled": true,
+    "ios": {
+      "supportsTablet": true,
+      "bundleIdentifier": "com.mavia321.asainspicesmobapp",
+      "infoPlist": {
+        "ITSAppUsesNonExemptEncryption": false
+      }
+    },
+    "android": {
+      "adaptiveIcon": {
+        "backgroundColor": "#FFFFFF",
+        "foregroundImage": "./assets/images/adaptive-icon-foreground.png"
+      },
+      "edgeToEdgeEnabled": false,
+      "predictiveBackGestureEnabled": false,
+      "permissions": [
+        "android.permission.RECORD_AUDIO",
+        "android.permission.POST_NOTIFICATIONS"
+      ],
+      "package": "com.mavia321.asainspicesmobapp"
+    },
+    "androidNavigationBar": {
+      "barStyle": "dark-content",
+      "enforceContrast": true
+    },
+    "web": {
+      "output": "static",
+      "favicon": "./assets/images/favicon.png",
+      "bundler": "metro"
+    },
+    "plugins": [
+      "expo-router",
+      [
+        "expo-notifications",
+        {
+          "color": "#FF9800",
+          "defaultChannel": "default"
+        }
+      ],
+      [
+        "expo-image-picker",
+        {
+          "photosPermission": "Allow Asian Spices to access your photos to upload recipe reels.",
+          "cameraPermission": "Allow Asian Spices to access your camera to record recipe reels."
+        }
+      ],
+      "expo-video",
+      [
+        "expo-splash-screen",
+        {
+          "image": "./assets/images/asian-spices-logo.png",
+          "imageWidth": 200,
+          "resizeMode": "contain",
+          "backgroundColor": "#ffffff",
+          "dark": {
+            "backgroundColor": "#000000"
+          }
+        }
+      ]
+    ],
+    "experiments": {
+      "typedRoutes": true,
+      "reactCompiler": true
+    },
+    "extra": {
+      "router": {},
+      "eas": {
+        "projectId": "42203a12-d07c-4486-b1bb-0e3aa9061ae4"
+      }
+    }
+  }
+}

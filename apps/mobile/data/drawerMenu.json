@@ -1,0 +1,84 @@
+{
+  "mainLinks": [
+    {
+      "id": "home",
+      "label": "Home",
+      "icon": "home-outline",
+      "route": "/(tabs)"
+    },
+    {
+      "id": "categories",
+      "label": "Shop By Categories",
+      "icon": "grid-outline",
+      "route": "/categories"
+    }
+  ],
+  "healthyLivingItems": [
+    {
+      "id": "1",
+      "title": "Health Benefits",
+      "subtitle": "Natural wellness guide",
+      "image": "https://images.unsplash.com/photo-1505576399279-565b52d4ac7b?w=200&q=80",
+      "route": "/health-benefits-of-herbs"
+    },
+    {
+      "id": "2",
+      "title": "Herbal Food Supplements",
+      "subtitle": "Capsules, powders & teas",
+      "image": "https://images.unsplash.com/photo-1584308666744-24d5c474f2ae?w=200&q=80",
+      "route": "/herbal-food-supplements"
+    },
+    {
+      "id": "3",
+      "title": "Herbal Skin Products",
+      "subtitle": "Face oils, creams & cleansers",
+      "image": "https://images.unsplash.com/photo-1556228578-0d85b1a4d571?w=200&q=80",
+      "route": "/herbal-skin-products"
+    },
+    {
+      "id": "4",
+      "title": "Herbal Hair Products",
+      "subtitle": "Hair oils, shampoos & masks",
+      "image": "https://images.unsplash.com/photo-1608248543801-ba977f7c8dbb?w=200&q=80",
+      "route": "/herbal-hair-products"
+    }
+  ],
+  "bottomLinks": [
+    {
+      "id": "recipes",
+      "label": "Authentic Asian Recipes",
+      "icon": "book-outline",
+      "route": "/recipes"
+    },
+    {
+      "id": "wishlist",
+      "label": "Wishlist",
+      "icon": "heart-outline",
+      "route": "/wishlist"
+    },
+    {
+      "id": "cart",
+      "label": "Cart",
+      "icon": "cart-outline",
+      "route": "/cart"
+    },
+    {
+      "id": "contact",
+      "label": "Contact us",
+      "icon": "headset-outline",
+      "route": "/help-support"
+    },
+    {
+      "id": "account",
+      "label": "My Account",
+      "icon": "person-circle-outline",
+      "route": "/(tabs)/profile"
+    },
+    {
+      "id": "orders",
+      "label": "Orders",
+      "icon": "cube-outline",
+      "route": "/my-orders"
+    }
+  ]
+}
