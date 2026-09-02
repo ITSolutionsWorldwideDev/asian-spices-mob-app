@@ -21,7 +21,7 @@ export default function BibiLogoAvatar({ size = 44 }: BibiLogoAvatarProps) {
       }}
     >
       <Image
-        source={require("@/assets/images/asian-spices-logo.png")}
+        source={require("@/assets/images/image.png")}
         style={{ width: size, height: size }}
         contentFit="contain"
         accessibilityLabel="Bibi assistant"

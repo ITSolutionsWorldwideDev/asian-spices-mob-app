@@ -175,6 +175,22 @@ export async function login(params: { email: string; password: string }) {
   return response;
 }
 
+export async function requestPasswordReset(email: string) {
+  return post<{ success?: boolean }>("/api/auth/forgot-password", {
+    email: email.trim().toLowerCase(),
+  });
+}
+
+export async function resetPasswordWithOtp(params: {
+  token: string;
+  password: string;
+}) {
+  return post<{ success?: boolean }>("/api/auth/reset-password", {
+    token: params.token.trim(),
+    password: params.password,
+  });
+}
+
 async function persistAuthPayload(payload: AuthResponse): Promise<void> {
   await AsyncStorage.setItem(AUTH_USER_STORAGE_KEY, JSON.stringify(payload.user));
 

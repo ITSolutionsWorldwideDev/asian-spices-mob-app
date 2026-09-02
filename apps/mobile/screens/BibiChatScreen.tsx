@@ -309,8 +309,8 @@ export default function BibiChatScreen() {
         <View className="flex-row items-center justify-between border-b border-[#ece6dc] bg-[#fffaf4] px-4 py-3">
           <View className="flex-row items-center">
             <Image
-              source={require("@/assets/images/asian-spices-logo.png")}
-              style={{ width: 120, height: 36 }}
+              source={require("@/assets/images/image.png")}
+              style={{ width: 52, height: 52 }}
               resizeMode="contain"
             />
           </View>
