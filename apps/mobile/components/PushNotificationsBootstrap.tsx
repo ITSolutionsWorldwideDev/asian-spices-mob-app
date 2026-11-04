@@ -6,6 +6,7 @@ import {
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { useRouter } from "expo-router";
 import { useEffect, useRef } from "react";
+import { Platform } from "react-native";
 import * as Notifications from "expo-notifications";
 
 const HANDLED_NOTIFICATION_KEY = "@asian_spices_handled_notification_id";
@@ -80,6 +81,10 @@ export default function PushNotificationsBootstrap() {
   const handledInitial = useRef(false);
 
   useEffect(() => {
+    if (Platform.OS === "web") {
+      return;
+    }
+
     void syncPushRegistration();
 
     const subscription = addNotificationResponseListener((response) => {

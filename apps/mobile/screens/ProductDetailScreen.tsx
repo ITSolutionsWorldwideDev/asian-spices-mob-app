@@ -301,11 +301,11 @@ export default function ProductDetailScreen() {
         contentContainerStyle={{ paddingBottom: 24 }}
         showsVerticalScrollIndicator={false}
       >
-        <View className="relative mx-4 mt-4 rounded-2xl overflow-hidden">
+        <View className="relative mx-4 mt-4 rounded-2xl overflow-hidden bg-white border border-[#EAEAEA] p-3 items-center justify-center">
           <Image
             source={{ uri: product.image }}
-            style={{ width: "100%", height: 280 }}
-            contentFit="cover"
+            style={{ width: "100%", height: 320 }}
+            contentFit="contain"
           />
           {product.category ? (
             <View className="absolute top-3 left-3 bg-white/95 rounded-lg px-2.5 py-1.5">

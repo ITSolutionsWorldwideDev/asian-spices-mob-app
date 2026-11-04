@@ -1,11 +1,9 @@
 import AuthTextField from "@/components/AuthTextField";
-// import SocialButton from "@/components/SocialButton";
 import { signup } from "@/services/api/authService";
-// import { AntDesign, FontAwesome } from "@expo/vector-icons";
+import { showAlert } from "@/utils/alert";
 import { useRouter } from "expo-router";
 import React, { useState } from "react";
 import {
-  Alert,
   KeyboardAvoidingView,
   Platform,
   ScrollView,
@@ -23,33 +21,60 @@ export default function SignUpScreen() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
+
+  const [nameError, setNameError] = useState("");
+  const [emailError, setEmailError] = useState("");
+  const [passwordError, setPasswordError] = useState("");
+  const [confirmPasswordError, setConfirmPasswordError] = useState("");
+  const [generalError, setGeneralError] = useState("");
   const [loading, setLoading] = useState(false);
 
   const isValidEmail = (value: string) => /\S+@\S+\.\S+/.test(value);
 
   const handleCreateAccount = async () => {
+    setNameError("");
+    setEmailError("");
+    setPasswordError("");
+    setConfirmPasswordError("");
+    setGeneralError("");
+
     const trimmedName = name.trim();
     const trimmedEmail = email.trim().toLowerCase();
     const trimmedPassword = password.trim();
     const trimmedConfirmPassword = confirmPassword.trim();
 
+    let hasError = false;
+
     if (!trimmedName) {
-      Alert.alert("Validation", "Name is required.");
-      return;
+      setNameError("Full name is required.");
+      hasError = true;
     }
 
-    if (!trimmedEmail || !isValidEmail(trimmedEmail)) {
-      Alert.alert("Validation", "Please enter a valid email address.");
-      return;
+    if (!trimmedEmail) {
+      setEmailError("Email is required.");
+      hasError = true;
+    } else if (!isValidEmail(trimmedEmail)) {
+      setEmailError("Please enter a valid email address.");
+      hasError = true;
     }
 
-    if (trimmedPassword.length < 6) {
-      Alert.alert("Validation", "Password must be at least 6 characters.");
-      return;
+    if (!trimmedPassword) {
+      setPasswordError("Password is required.");
+      hasError = true;
+    } else if (trimmedPassword.length < 6) {
+      setPasswordError("Password must be at least 6 characters.");
+      hasError = true;
     }
 
-    if (trimmedPassword !== trimmedConfirmPassword) {
-      Alert.alert("Validation", "Passwords do not match.");
+    if (!trimmedConfirmPassword) {
+      setConfirmPasswordError("Please confirm your password.");
+      hasError = true;
+    } else if (trimmedPassword !== trimmedConfirmPassword) {
+      setConfirmPasswordError("Passwords do not match.");
+      hasError = true;
+    }
+
+    if (hasError) {
       return;
     }
 
@@ -61,11 +86,19 @@ export default function SignUpScreen() {
         password: trimmedPassword,
         confirmPassword: trimmedConfirmPassword,
       });
-      Alert.alert("Success", "Account created successfully.");
+
+      showAlert("Success", "Account created successfully.", [
+        {
+          text: "OK",
+          onPress: () => router.replace("/login"),
+        },
+      ]);
       router.replace("/login");
     } catch (error) {
-      const message = error instanceof Error ? error.message : "Unable to create account";
-      Alert.alert("Signup failed", message);
+      const message =
+        error instanceof Error ? error.message : "Unable to create account";
+      setGeneralError(message);
+      showAlert("Signup failed", message);
     } finally {
       setLoading(false);
     }
@@ -88,38 +121,93 @@ export default function SignUpScreen() {
           </Text>
 
           <View className="gap-4">
-            <AuthTextField
-              icon="person-outline"
-              placeholder="Full Name"
-              value={name}
-              onChangeText={setName}
-              autoComplete="name"
-            />
-            <AuthTextField
-              icon="mail-outline"
-              placeholder="Email"
-              value={email}
-              onChangeText={setEmail}
-              keyboardType="email-address"
-              autoComplete="email"
-            />
-            <AuthTextField
-              icon="lock-closed-outline"
-              placeholder="Password"
-              value={password}
-              onChangeText={setPassword}
-              isPassword
-              autoComplete="new-password"
-            />
-            <AuthTextField
-              icon="lock-closed-outline"
-              placeholder="Confirm Password"
-              value={confirmPassword}
-              onChangeText={setConfirmPassword}
-              isPassword
-              autoComplete="new-password"
-            />
+            <View>
+              <AuthTextField
+                icon="person-outline"
+                placeholder="Full Name"
+                value={name}
+                onChangeText={(val) => {
+                  setName(val);
+                  if (nameError) setNameError("");
+                  if (generalError) setGeneralError("");
+                }}
+                autoComplete="name"
+              />
+              {nameError ? (
+                <Text className="text-[#EF4444] text-xs mt-1.5 ml-1">
+                  {nameError}
+                </Text>
+              ) : null}
+            </View>
+
+            <View>
+              <AuthTextField
+                icon="mail-outline"
+                placeholder="Email"
+                value={email}
+                onChangeText={(val) => {
+                  setEmail(val);
+                  if (emailError) setEmailError("");
+                  if (generalError) setGeneralError("");
+                }}
+                keyboardType="email-address"
+                autoComplete="email"
+              />
+              {emailError ? (
+                <Text className="text-[#EF4444] text-xs mt-1.5 ml-1">
+                  {emailError}
+                </Text>
+              ) : null}
+            </View>
+
+            <View>
+              <AuthTextField
+                icon="lock-closed-outline"
+                placeholder="Password"
+                value={password}
+                onChangeText={(val) => {
+                  setPassword(val);
+                  if (passwordError) setPasswordError("");
+                  if (generalError) setGeneralError("");
+                }}
+                isPassword
+                autoComplete="new-password"
+              />
+              {passwordError ? (
+                <Text className="text-[#EF4444] text-xs mt-1.5 ml-1">
+                  {passwordError}
+                </Text>
+              ) : null}
+            </View>
+
+            <View>
+              <AuthTextField
+                icon="lock-closed-outline"
+                placeholder="Confirm Password"
+                value={confirmPassword}
+                onChangeText={(val) => {
+                  setConfirmPassword(val);
+                  if (confirmPasswordError) setConfirmPasswordError("");
+                  if (generalError) setGeneralError("");
+                }}
+                isPassword
+                autoComplete="new-password"
+              />
+              {confirmPasswordError ? (
+                <Text className="text-[#EF4444] text-xs mt-1.5 ml-1">
+                  {confirmPasswordError}
+                </Text>
+              ) : null}
+            </View>
           </View>
+
+          {generalError ? (
+            <View className="mt-4 p-3 bg-red-50 border border-red-200 rounded-xl">
+              <Text className="text-[#EF4444] text-xs text-center font-medium">
+                {generalError}
+              </Text>
+            </View>
+          ) : null}
 
           <Text className="text-[#9CA3AF] text-sm mt-5 leading-5">
             By clicking the <Text className="text-[#FF9800] font-medium">Register</Text> button,
@@ -144,22 +232,6 @@ export default function SignUpScreen() {
               {loading ? "Creating..." : "Create Account"}
             </Text>
           </TouchableOpacity>
-
-          {/* <Text className="text-[#9CA3AF] text-sm text-center mt-8 mb-6">
-            - OR Continue with -
-          </Text>
-
-          <View className="flex-row justify-center items-center gap-5">
-            <SocialButton>
-              <AntDesign name="google" size={22} color="#EA4335" />
-            </SocialButton>
-            <SocialButton>
-              <AntDesign name="apple" size={24} color="#000000" />
-            </SocialButton>
-            <SocialButton>
-              <FontAwesome name="facebook" size={22} color="#1877F2" />
-            </SocialButton>
-          </View> */}
 
           <View className="flex-1 justify-end items-center mt-10">
             <TouchableOpacity

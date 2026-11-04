@@ -3,15 +3,16 @@ import {
   requestPasswordReset,
   resetPasswordWithOtp,
 } from "@/services/api/authService";
+import { showAlert } from "@/utils/alert";
 import { useRouter } from "expo-router";
 import React, { useState } from "react";
 import {
-  Alert,
   KeyboardAvoidingView,
   Platform,
   ScrollView,
   Text,
   TouchableOpacity,
+  View,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
@@ -24,20 +25,29 @@ export default function ForgotPasswordScreen() {
   const [otp, setOtp] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
+
+  const [emailError, setEmailError] = useState("");
+  const [otpError, setOtpError] = useState("");
+  const [passwordError, setPasswordError] = useState("");
+  const [confirmPasswordError, setConfirmPasswordError] = useState("");
+  const [generalError, setGeneralError] = useState("");
   const [loading, setLoading] = useState(false);
 
   const isValidEmail = (value: string) => /\S+@\S+\.\S+/.test(value);
 
   const handleSendOtp = async () => {
+    setEmailError("");
+    setGeneralError("");
+
     const trimmedEmail = email.trim().toLowerCase();
 
     if (!trimmedEmail) {
-      Alert.alert("Email required", "Please enter your email address.");
+      setEmailError("Please enter your email address.");
       return;
     }
 
     if (!isValidEmail(trimmedEmail)) {
-      Alert.alert("Invalid email", "Please enter a valid email address.");
+      setEmailError("Please enter a valid email address.");
       return;
     }
 
@@ -46,38 +56,53 @@ export default function ForgotPasswordScreen() {
       await requestPasswordReset(trimmedEmail);
       setEmail(trimmedEmail);
       setStep("reset");
-      Alert.alert(
-        "OTP sent",
-        "If an account exists for this email, a reset code has been sent.",
+      showAlert(
+        "OTP Sent",
+        "If an account exists for this email, a reset code has been sent. Please check your inbox and spam folder.",
       );
     } catch (error) {
       const message =
         error instanceof Error ? error.message : "Could not send reset code.";
-      Alert.alert("Request failed", message);
+      setGeneralError(message);
+      showAlert("Request Failed", message);
     } finally {
       setLoading(false);
     }
   };
 
   const handleResetPassword = async () => {
+    setOtpError("");
+    setPasswordError("");
+    setConfirmPasswordError("");
+    setGeneralError("");
+
     const trimmedOtp = otp.trim();
     const trimmedPassword = password.trim();
     const trimmedConfirm = confirmPassword.trim();
+    let hasError = false;
 
     if (!trimmedOtp) {
-      Alert.alert("OTP required", "Please enter the code sent to your email.");
-      return;
+      setOtpError("Please enter the code sent to your email.");
+      hasError = true;
     }
 
-    if (trimmedPassword.length < 6) {
-      Alert.alert("Weak password", "Password must be at least 6 characters.");
-      return;
+    if (!trimmedPassword) {
+      setPasswordError("Password is required.");
+      hasError = true;
+    } else if (trimmedPassword.length < 6) {
+      setPasswordError("Password must be at least 6 characters.");
+      hasError = true;
     }
 
-    if (trimmedPassword !== trimmedConfirm) {
-      Alert.alert("Password mismatch", "Passwords do not match.");
-      return;
+    if (!trimmedConfirm) {
+      setConfirmPasswordError("Please confirm your password.");
+      hasError = true;
+    } else if (trimmedPassword !== trimmedConfirm) {
+      setConfirmPasswordError("Passwords do not match.");
+      hasError = true;
     }
+
+    if (hasError) return;
 
     try {
       setLoading(true);
@@ -85,13 +110,17 @@ export default function ForgotPasswordScreen() {
         token: trimmedOtp,
         password: trimmedPassword,
       });
-      Alert.alert("Password updated", "You can now login with your new password.", [
-        { text: "OK", onPress: () => router.replace("/login") },
-      ]);
+      showAlert(
+        "Password Updated",
+        "You can now login with your new password.",
+        [{ text: "OK", onPress: () => router.replace("/login") }],
+      );
+      router.replace("/login");
     } catch (error) {
       const message =
         error instanceof Error ? error.message : "Could not reset password.";
-      Alert.alert("Reset failed", message);
+      setGeneralError(message);
+      showAlert("Reset Failed", message);
     } finally {
       setLoading(false);
     }
@@ -115,14 +144,33 @@ export default function ForgotPasswordScreen() {
 
           {step === "email" ? (
             <>
-              <AuthTextField
-                icon="mail-outline"
-                placeholder="Enter your email address"
-                value={email}
-                onChangeText={setEmail}
-                keyboardType="email-address"
-                autoComplete="email"
-              />
+              <View>
+                <AuthTextField
+                  icon="mail-outline"
+                  placeholder="Enter your email address"
+                  value={email}
+                  onChangeText={(val) => {
+                    setEmail(val);
+                    if (emailError) setEmailError("");
+                    if (generalError) setGeneralError("");
+                  }}
+                  keyboardType="email-address"
+                  autoComplete="email"
+                />
+                {emailError ? (
+                  <Text className="text-[#EF4444] text-xs mt-1.5 ml-1">
+                    {emailError}
+                  </Text>
+                ) : null}
+              </View>
+
+              {generalError ? (
+                <View className="mt-4 p-3 bg-red-50 border border-red-200 rounded-xl">
+                  <Text className="text-[#EF4444] text-xs text-center font-medium">
+                    {generalError}
+                  </Text>
+                </View>
+              ) : null}
 
               <Text className="text-[#9CA3AF] text-sm mt-3 leading-5">
                 <Text className="text-red-500">* </Text>
@@ -154,32 +202,75 @@ export default function ForgotPasswordScreen() {
                 Enter the 6-digit code sent to {email}
               </Text>
 
-              <AuthTextField
-                icon="key-outline"
-                placeholder="Enter OTP code"
-                value={otp}
-                onChangeText={setOtp}
-                keyboardType="number-pad"
-                maxLength={6}
-              />
+              <View className="gap-4">
+                <View>
+                  <AuthTextField
+                    icon="key-outline"
+                    placeholder="Enter OTP code"
+                    value={otp}
+                    onChangeText={(val) => {
+                      setOtp(val);
+                      if (otpError) setOtpError("");
+                      if (generalError) setGeneralError("");
+                    }}
+                    keyboardType="number-pad"
+                    maxLength={6}
+                  />
+                  {otpError ? (
+                    <Text className="text-[#EF4444] text-xs mt-1.5 ml-1">
+                      {otpError}
+                    </Text>
+                  ) : null}
+                </View>
 
-              <AuthTextField
-                icon="lock-closed-outline"
-                placeholder="New password"
-                value={password}
-                onChangeText={setPassword}
-                isPassword
-                autoComplete="password-new"
-              />
+                <View>
+                  <AuthTextField
+                    icon="lock-closed-outline"
+                    placeholder="New password"
+                    value={password}
+                    onChangeText={(val) => {
+                      setPassword(val);
+                      if (passwordError) setPasswordError("");
+                      if (generalError) setGeneralError("");
+                    }}
+                    isPassword
+                    autoComplete="new-password"
+                  />
+                  {passwordError ? (
+                    <Text className="text-[#EF4444] text-xs mt-1.5 ml-1">
+                      {passwordError}
+                    </Text>
+                  ) : null}
+                </View>
 
-              <AuthTextField
-                icon="lock-closed-outline"
-                placeholder="Confirm new password"
-                value={confirmPassword}
-                onChangeText={setConfirmPassword}
-                isPassword
-                autoComplete="password-new"
-              />
+                <View>
+                  <AuthTextField
+                    icon="lock-closed-outline"
+                    placeholder="Confirm new password"
+                    value={confirmPassword}
+                    onChangeText={(val) => {
+                      setConfirmPassword(val);
+                      if (confirmPasswordError) setConfirmPasswordError("");
+                      if (generalError) setGeneralError("");
+                    }}
+                    isPassword
+                    autoComplete="new-password"
+                  />
+                  {confirmPasswordError ? (
+                    <Text className="text-[#EF4444] text-xs mt-1.5 ml-1">
+                      {confirmPasswordError}
+                    </Text>
+                  ) : null}
+                </View>
+              </View>
+
+              {generalError ? (
+                <View className="mt-4 p-3 bg-red-50 border border-red-200 rounded-xl">
+                  <Text className="text-[#EF4444] text-xs text-center font-medium">
+                    {generalError}
+                  </Text>
+                </View>
+              ) : null}
 
               <TouchableOpacity
                 onPress={handleResetPassword}

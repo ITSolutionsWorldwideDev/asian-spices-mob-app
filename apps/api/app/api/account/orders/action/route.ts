@@ -2,7 +2,10 @@
 
 import { NextResponse } from "next/server";
 import { pool } from "@/core/db";
-import { sendReturnStatusUpdateEmail } from "@/core/email-templates";
+import {
+  sendCancellationEmail,
+  sendReturnStatusUpdateEmail,
+} from "@/core/email-templates";
 
 export async function POST(request: Request) {
   const client = await pool.connect();
@@ -85,6 +88,17 @@ export async function POST(request: Request) {
       await client.query(updateMasterOrderQuery, [orderId]);
 
       await client.query("COMMIT");
+
+      try {
+        await sendCancellationEmail(
+          orderId,
+          undefined,
+          reason,
+          comments,
+        );
+      } catch (emailErr) {
+        console.error("[Cancellation Email Error]:", emailErr);
+      }
 
       return NextResponse.json(
         {
@@ -227,7 +241,10 @@ export async function POST(request: Request) {
 
 /* import { NextResponse } from "next/server";
 import { pool } from "@/core/db";
-import { sendReturnStatusUpdateEmail } from "@/core/email-templates";
+import {
+  sendCancellationEmail,
+  sendReturnStatusUpdateEmail,
+} from "@/core/email-templates";
 
 export async function POST(request: Request) {
   const client = await pool.connect();

@@ -271,18 +271,12 @@ export default function HomeScreen() {
           minHeight={180}
         >
           <View className="bg-[#FFF5F5] py-4 mb-2">
-            <View className="flex-row items-center justify-between px-4 mb-3">
-              <View>
-                <Text className="text-[17px] font-bold text-black">Trending Recipe Reels</Text>
-                <Text className="text-[13px] text-[#9CA3AF] mt-0.5">Watch & Cook</Text>
-              </View>
-              <TouchableOpacity
-                onPress={() => openReels()}
-                className="w-9 h-9 rounded-full bg-[#FF9800] justify-center items-center"
-              >
-                <Ionicons name="arrow-up" size={18} color="#FFFFFF" />
-              </TouchableOpacity>
-            </View>
+            <SectionHeader
+              title="Trending Recipe Reels"
+              subtitle="Watch & Cook"
+              actionLabel="See More"
+              onActionPress={() => openReels()}
+            />
             <ReelsRow reels={reelsSection.data} onReelPress={handleReelPress} />
           </View>
         </LazyHomeSection>

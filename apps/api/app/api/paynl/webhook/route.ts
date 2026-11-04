@@ -2,163 +2,174 @@
 
 import { NextRequest, NextResponse } from "next/server";
 import { pool } from "@/core/db";
-import { notifyOrderEvent } from "@/core/notifications";
 import { assignNextStore } from "@/core/order-routing";
+import { sendOrderConfirmationEmail } from "@/core/email-templates";
 
 const PAYNL_API_TOKEN = process.env.PAYNL_API_TOKEN;
 
-/**
- * Webhook endpoint for Pay.nl to notify payment status
- */
-export async function POST(req: NextRequest) {
-  console.log("🔥 WEBHOOK HIT");
-  const client = await pool.connect();
-  try {
-    const body = await req.json();
+async function handlePaynlNotification(req: NextRequest) {
+  console.log("🔥 PAYNL WEBHOOK HIT:", req.method);
 
-    console.log("Pay.nl webhook:", body);
+  let transactionId = "";
+  let action = "";
+  let reference = "";
+  let statusUrl = "";
 
-    const transactionId = body.id;
-    // const status = body.status?.toLowerCase();
-    const status = body.status?.action?.toLowerCase();
-    const reference = body.reference || body.order?.reference;
+  // 1️⃣ Extract parameters from either GET (query params) or POST (JSON / form-data)
+  if (req.method === "GET") {
+    const { searchParams } = new URL(req.url);
+    transactionId = searchParams.get("order_id") || searchParams.get("id") || "";
+    action = searchParams.get("action") || "";
+    reference = searchParams.get("extra1") || searchParams.get("reference") || "";
+  } else {
+    try {
+      const contentType = req.headers.get("content-type") || "";
+      if (contentType.includes("application/json")) {
+        const body = await req.json();
+        transactionId = body.id || body.order_id || "";
+        action = body.status?.action?.toLowerCase() || body.action?.toLowerCase() || "";
+        reference = body.reference || body.order?.reference || body.extra1 || "";
+        statusUrl = body?.links?.status || "";
+      } else if (contentType.includes("application/x-www-form-urlencoded") || contentType.includes("multipart/form-data")) {
+        const formData = await req.formData();
+        transactionId = (formData.get("order_id") || formData.get("id") || "").toString();
+        action = (formData.get("action") || "").toString();
+        reference = (formData.get("extra1") || formData.get("reference") || "").toString();
+      }
+    } catch (parseErr) {
+      console.warn("Failed to parse POST body, trying query params fallback:", parseErr);
+      const { searchParams } = new URL(req.url);
+      transactionId = searchParams.get("order_id") || searchParams.get("id") || "";
+      action = searchParams.get("action") || "";
+      reference = searchParams.get("extra1") || searchParams.get("reference") || "";
+    }
+  }
 
-    if (!reference) {
-      console.error("Missing reference in webhook:", body);
-      return NextResponse.json(
-        { success: false, error: "Missing order reference" },
-        { status: 400 },
+  // If reference is still empty, look up store_orders by transaction_id
+  if (!reference && transactionId) {
+    try {
+      const orderLookup = await pool.query(
+        `SELECT id FROM store_orders WHERE transaction_id = $1 LIMIT 1`,
+        [transactionId],
       );
+      if (orderLookup.rowCount && orderLookup.rowCount > 0) {
+        reference = orderLookup.rows[0].id.toString();
+      }
+    } catch (lookupErr) {
+      console.error("Order lookup by transactionId failed:", lookupErr);
     }
+  }
 
-    // 🔐 OPTIONAL SAFETY: verify using statusUrl if available
-    const statusUrl = body?.links?.status;
+  if (!transactionId && !reference) {
+    console.error("Missing transactionId and reference in Paynl webhook");
+    return new Response("TRUE", { status: 200 });
+  }
 
-    // let verifiedStatus = body?.status?.action?.toLowerCase();
-    let verifiedStatus =
-      body?.status?.action?.toLowerCase() || body?.status?.toLowerCase();
+  // 2️⃣ Verify status with Pay.nl Connect API if token is present
+  let verifiedStatus = action.toLowerCase();
 
-    if (statusUrl) {
-      const verifyRes = await fetch(statusUrl, {
-        headers: {
-          Authorization: `Bearer ${PAYNL_API_TOKEN}`,
-          Accept: "application/json",
+  if (transactionId && PAYNL_API_TOKEN) {
+    try {
+      const verifyRes = await fetch(
+        statusUrl || `https://connect.pay.nl/v1/orders/${transactionId}`,
+        {
+          headers: {
+            Authorization: `Bearer ${PAYNL_API_TOKEN}`,
+            Accept: "application/json",
+          },
         },
-      });
-
-      const verifyData = await verifyRes.json();
-
-      verifiedStatus =
-        verifyData?.status?.action?.toLowerCase() ||
-        verifyData?.status?.toLowerCase();
-    }
-    console.log("Webhook reference:", reference);
-    console.log("Webhook transactionId:", transactionId);
-    console.log("Webhook status:", verifiedStatus);
-
-    // =========================
-    // STATUS MAPPING
-    // =========================
-    let paymentStatus: "pending" | "paid" | "failed" = "pending";
-
-    if (verifiedStatus === "paid") {
-      paymentStatus = "paid";
-    } else if (["failed", "cancelled", "expired"].includes(verifiedStatus)) {
-      paymentStatus = "failed";
-    }
-
-    // =========================
-    // IDEMPOTENT UPDATE
-    // =========================
-
-    if (paymentStatus === "paid") {
-      const client = await pool.connect();
-      try {
-        await client.query("BEGIN");
-
-        const result: any = await client.query(
-          ` UPDATE store_orders
-            SET payment_status = 'paid',       
-                transaction_id = COALESCE($1, transaction_id),
-                order_status = 'pending',
-                updated_at = NOW()
-            WHERE id = $2 AND payment_status != 'paid'
-            RETURNING id, order_number`,
-          [transactionId, reference], // transaction_id = $1
+      );
+      if (verifyRes.ok) {
+        const verifyData = await verifyRes.json();
+        verifiedStatus = (
+          verifyData?.status?.action?.toLowerCase() ||
+          verifyData?.status?.toLowerCase() ||
+          verifiedStatus
         );
+      }
+    } catch (verifyErr) {
+      console.warn("Paynl API status verification skipped or failed:", verifyErr);
+    }
+  }
 
-        if (result.rowCount > 0) {
-          const confirmedOrder = result.rows[0];
+  console.log("Paynl resolved status:", { transactionId, reference, verifiedStatus });
 
-          // ⚡ INVOKE CORRESPONDING DECENTRALIZED ASSIGNMENT SYSTEM HERE TOO ⚡
-          await assignNextStore(client, confirmedOrder.id);
+  // 3️⃣ Status Mapping
+  let paymentStatus: "pending" | "paid" | "failed" = "pending";
+  if (
+    verifiedStatus === "paid" ||
+    verifiedStatus === "new_ppt" ||
+    verifiedStatus === "completed"
+  ) {
+    paymentStatus = "paid";
+  } else if (["failed", "cancelled", "expired", "denied"].includes(verifiedStatus)) {
+    paymentStatus = "failed";
+  }
 
-          await notifyOrderEvent({
-            orderId: confirmedOrder.id,
-            type: "order_placed",
-            title: "Order Placed",
-            body: `Your payment was received and order #${confirmedOrder.order_number} has been placed successfully.`,
-            data: { screen: "track-order" },
-            client,
-          });
-        }
+  // 4️⃣ Idempotent DB update & dispatch
+  if (paymentStatus === "paid" && reference) {
+    const client = await pool.connect();
+    let confirmedOrderId: string | null = null;
 
-        if (paymentStatus === "paid") {
-          const confirmedOrder = result.rows[0];
-          console.log(
-            `Order ${confirmedOrder.order_number} paid. Handing off to the decentralized fulfillment engine...`,
-          );
-          // invokeFulfillmentRouter(confirmedOrder.id);
-        }
+    try {
+      await client.query("BEGIN");
 
-        await client.query("COMMIT");
-      } catch (txError) {
-        await client.query("ROLLBACK");
-        throw txError;
-      } finally {
-        client.release();
+      const result: any = await client.query(
+        `UPDATE store_orders
+         SET payment_status = 'paid',
+             transaction_id = COALESCE($1, transaction_id),
+             order_status = 'pending',
+             updated_at = NOW()
+         WHERE id = $2 AND payment_status != 'paid'
+         RETURNING id, order_number`,
+        [transactionId || null, reference],
+      );
+
+      if (result.rowCount && result.rowCount > 0) {
+        confirmedOrderId = result.rows[0].id;
+        await assignNextStore(client, confirmedOrderId!);
+      }
+
+      await client.query("COMMIT");
+    } catch (txError) {
+      await client.query("ROLLBACK");
+      console.error("Paynl DB transaction failed:", txError);
+    } finally {
+      client.release();
+    }
+
+    // Dispatch email outside the DB transaction for maximum serverless reliability
+    if (confirmedOrderId) {
+      try {
+        await sendOrderConfirmationEmail(confirmedOrderId);
+      } catch (emailErr) {
+        console.error("[Email Trigger Error PayNL Webhook]:", emailErr);
       }
     }
-
-    /* 
-    const result = await client.query(
-      `
-      UPDATE store_orders
-      SET payment_status = $1,
-          transaction_id = COALESCE($2, transaction_id),
-          updated_at = NOW()
-      WHERE id = $3
-        AND payment_status != 'paid'
-      RETURNING id, order_number
-      `,
-      [paymentStatus, transactionId, reference],
-    );
-
-    if (result.rowCount === 0) {
-      // Return 200 to prevent gateway retries if the order was already processed or doesn't match
-      return new Response("Order already processed or not found", { status: 200 });
-    } 
-
-    //  TRIGGER MULTI-STORE ROUTING SUBROUTINE HERE IF PAID!
-    if (paymentStatus === "paid") {
-      const confirmedOrder = result.rows[0];
-      console.log(`Order ${confirmedOrder.order_number} paid. Handing off to the decentralized fulfillment engine...`);
-      // invokeFulfillmentRouter(confirmedOrder.id);
+  } else if (paymentStatus === "failed" && reference) {
+    try {
+      await pool.query(
+        `UPDATE store_orders
+         SET payment_status = 'failed',
+             transaction_id = COALESCE($1, transaction_id),
+             updated_at = NOW()
+         WHERE id = $2 AND payment_status != 'paid'`,
+        [transactionId || null, reference],
+      );
+    } catch (failTxErr) {
+      console.error("Paynl failed status update error:", failTxErr);
     }
-    */
-    // console.log(`Order ${reference} → ${paymentStatus}`);
-
-    // return NextResponse.json({ success: true });
-    return new Response("TRUE", { status: 200 });
-  } catch (err) {
-    console.error(
-      "Pay.nl asynchronous server processing webhook catch block error:",
-      err,
-    );
-    return new Response("Internal Server Error", { status: 500 });
-    // console.error("Webhook error:", err);
-    // return NextResponse.json({ success: false }, { status: 500 });
-  } finally {
-    client.release();
   }
+
+  // Pay.nl expects a 200 OK response with "TRUE" to confirm receipt
+  return new Response("TRUE", { status: 200 });
 }
+
+export async function GET(req: NextRequest) {
+  return handlePaynlNotification(req);
+}
+
+export async function POST(req: NextRequest) {
+  return handlePaynlNotification(req);
+}
+
