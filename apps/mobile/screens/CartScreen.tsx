@@ -1,9 +1,9 @@
 import CartListItem from "@/components/cart/CartListItem";
-import { MIN_ORDER_AMOUNT_EUR, useCart } from "@/contexts/CartContext";
+import { consolidateCartItems, MIN_ORDER_AMOUNT_EUR, useCart } from "@/contexts/CartContext";
 import { useCurrency } from "@/contexts/CurrencyContext";
 import { Ionicons } from "@expo/vector-icons";
 import { useRouter } from "expo-router";
-import React from "react";
+import React, { useMemo } from "react";
 import { ScrollView, Text, TouchableOpacity, View } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
@@ -12,9 +12,10 @@ export default function CartScreen() {
   const insets = useSafeAreaInsets();
   const { formatPrice } = useCurrency();
   const { items, itemCount, subtotal, taxTotal, getItemVatPercent, updateQuantity, removeItem } = useCart();
+  const displayItems = useMemo(() => consolidateCartItems(items), [items]);
 
   const total = subtotal;
-  const isEmpty = items.length === 0;
+  const isEmpty = displayItems.length === 0;
   const meetsMinOrder = subtotal >= MIN_ORDER_AMOUNT_EUR;
   const minOrderRemaining = Math.max(0, MIN_ORDER_AMOUNT_EUR - subtotal);
 
@@ -64,7 +65,7 @@ export default function CartScreen() {
             contentContainerStyle={{ paddingHorizontal: 16, paddingBottom: 24 }}
             showsVerticalScrollIndicator={false}
           >
-            {items.map((item) => (
+            {displayItems.map((item) => (
               <CartListItem
                 key={item.id}
                 item={item}

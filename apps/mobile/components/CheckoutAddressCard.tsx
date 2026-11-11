@@ -46,11 +46,35 @@ export default function CheckoutAddressCard({
         </TouchableOpacity>
       </View>
       <TouchableOpacity onPress={onPress} activeOpacity={0.85}>
+        {(address.fullName || address.firstName) ? (
+          <View className="flex-row items-center mb-1">
+            <Ionicons name="person-outline" size={14} color="#6B7280" style={{ marginRight: 4 }} />
+            <Text className="text-[#111827] text-sm font-semibold">
+              {address.fullName || `${address.firstName ?? ""} ${address.lastName ?? ""}`.trim()}
+            </Text>
+          </View>
+        ) : null}
         <Text className="text-[#4B5563] text-sm leading-5">{address.street}</Text>
+        {address.apartment ? (
+          <View className="flex-row items-center my-0.5">
+            <Text className="text-[#D97706] text-[11px] font-semibold bg-[#FEF3C7] px-1.5 py-0.5 rounded mr-1.5">
+              Apt / Line 2
+            </Text>
+            <Text className="text-[#374151] text-sm leading-5 font-medium">{address.apartment}</Text>
+          </View>
+        ) : null}
         <Text className="text-[#4B5563] text-sm leading-5">
-          {address.city}, {address.state} {address.zipCode}
+          {address.city}, {address.state ? `${address.state} ` : ""}{address.zipCode}
         </Text>
-        <Text className="text-[#4B5563] text-sm leading-5 mt-1">{address.phone}</Text>
+        {address.country ? (
+          <Text className="text-[#6B7280] text-xs leading-4 mt-0.5">{address.country}</Text>
+        ) : null}
+        {address.phone ? (
+          <View className="flex-row items-center mt-1">
+            <Ionicons name="call-outline" size={13} color="#6B7280" style={{ marginRight: 4 }} />
+            <Text className="text-[#4B5563] text-xs">{address.phone}</Text>
+          </View>
+        ) : null}
       </TouchableOpacity>
     </View>
   );

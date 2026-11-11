@@ -18,7 +18,7 @@ export default function CategoryListItem({ item, onPress }: CategoryListItemProp
       className="flex-row items-center bg-white rounded-2xl border border-[#F0F0F0] p-3 mb-3 mx-4"
     >
       <Image
-        source={resolveCategoryImage(item.id, item.title)}
+        source={resolveCategoryImage(item.id, item.title, item.image)}
         style={{ width: 72, height: 72, borderRadius: 12 }}
         contentFit="cover"
       />

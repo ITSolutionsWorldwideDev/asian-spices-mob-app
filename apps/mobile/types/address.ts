@@ -100,7 +100,6 @@ export function isAddressFormComplete(values: AddressFormData): boolean {
     values.country.trim().length > 0 &&
     values.street.trim().length > 0 &&
     values.city.trim().length > 0 &&
-    values.state.trim().length > 0 &&
     values.zipCode.trim().length > 0 &&
     (values.isShippingAddress || values.isBillingAddress)
   );

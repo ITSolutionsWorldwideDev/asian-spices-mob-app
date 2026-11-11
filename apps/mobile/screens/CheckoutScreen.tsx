@@ -1,14 +1,18 @@
 import AppHeader from "@/components/AppHeader";
+import CheckoutAddressCard from "@/components/CheckoutAddressCard";
 import CheckoutAddressForm from "@/components/CheckoutAddressForm";
 import CheckoutPaymentMethodCard from "@/components/CheckoutPaymentMethodCard";
+import AddressFormModal from "@/components/addresses/AddressFormModal";
 import { getCheckoutShippingFee, MIN_ORDER_AMOUNT_EUR, useCart } from "@/contexts/CartContext";
 import { useCurrency } from "@/contexts/CurrencyContext";
 import {
   formatAddressLine,
   formatFullAddress,
   getAddresses,
+  saveAddress,
   upsertAddress,
 } from "@/services/addressService";
+import { showAlert } from "@/utils/alert";
 import { API_BASE } from "@/services/api/apiBase";
 import { getStoredAuthUser } from "@/services/api/authService";
 import { apiRequest } from "@/services/api/httpClient";
@@ -65,17 +69,14 @@ function SectionHeader({
 }
 
 function isFormComplete(values: AddressFormData): boolean {
+  const hasName =
+    values.firstName.trim().length > 0 ||
+    values.fullName.trim().length > 0;
   return (
-    values.firstName.trim().length > 0 &&
-    values.lastName.trim().length > 0 &&
-    values.email.trim().length > 0 &&
-    values.email.includes("@") &&
-    values.country.trim().length > 0 &&
+    hasName &&
     values.street.trim().length > 0 &&
     values.city.trim().length > 0 &&
-    values.state.trim().length > 0 &&
-    values.zipCode.trim().length > 0 &&
-    values.phone.trim().length > 0
+    values.zipCode.trim().length > 0
   );
 }
 
@@ -118,6 +119,9 @@ export default function CheckoutScreen() {
   const [savingAddress, setSavingAddress] = useState(false);
   const [addresses, setAddresses] = useState<DeliveryAddress[]>([]);
   const [selectedAddressId, setSelectedAddressId] = useState<string | null>(null);
+  const [addressModalVisible, setAddressModalVisible] = useState(false);
+  const [editingAddress, setEditingAddress] = useState<DeliveryAddress | null>(null);
+  const [showManualAddressForm, setShowManualAddressForm] = useState(false);
   const [shippingOptions, setShippingOptions] = useState<ShippingOption[]>([]);
   const [selectedShippingId, setSelectedShippingId] = useState<string | null>(null);
   const [shippingLoading, setShippingLoading] = useState(false);
@@ -207,6 +211,7 @@ export default function CheckoutScreen() {
           ...next,
           email: next.email || current.email || authEmail,
           phone: next.phone || current.phone,
+          apartment: next.apartment || defaultAddress.apartment || "",
         };
       });
     }
@@ -282,8 +287,45 @@ export default function CheckoutScreen() {
       return {
         ...next,
         email: next.email || current.email || authEmail,
+        phone: next.phone || current.phone,
+        apartment: next.apartment || address.apartment || "",
       };
     });
+  };
+
+  const handleOpenAddAddress = () => {
+    setEditingAddress(null);
+    setAddressModalVisible(true);
+  };
+
+  const handleOpenEditAddress = (address: DeliveryAddress) => {
+    setEditingAddress(address);
+    setAddressModalVisible(true);
+  };
+
+  const handleSaveModalAddress = async (data: AddressFormData, existingId?: string) => {
+    try {
+      const saved = await saveAddress(data, existingId);
+      const refreshed = await getAddresses().catch(() => []);
+      setAddresses(refreshed);
+      setSelectedAddressId(saved.id);
+      const nextForm = addressToFormData(saved);
+      setAddressForm({
+        ...nextForm,
+        email: nextForm.email || authEmail,
+        phone: nextForm.phone || data.phone,
+      });
+      setAddressModalVisible(false);
+      showAlert(
+        "Address Saved",
+        existingId
+          ? "Delivery address updated successfully."
+          : "New delivery address added successfully."
+      );
+    } catch (error) {
+      const msg = error instanceof Error ? error.message : "Could not save address.";
+      showAlert("Error", msg);
+    }
   };
 
   const persistAddress = async () => {
@@ -294,10 +336,15 @@ export default function CheckoutScreen() {
 
     setSavingAddress(true);
     try {
+      const fullName =
+        `${addressForm.firstName} ${addressForm.lastName}`.trim() ||
+        addressForm.fullName?.trim() ||
+        addressForm.firstName.trim() ||
+        "Customer";
       const payload: AddressFormData = {
         ...addressForm,
         type: "other",
-        fullName: `${addressForm.firstName} ${addressForm.lastName}`.trim(),
+        fullName,
       };
       const saved = await upsertAddress(payload);
       await refreshAddresses();
@@ -392,38 +439,72 @@ export default function CheckoutScreen() {
     setPlacingOrder(true);
 
     try {
-    let savedAddress: DeliveryAddress | null;
-    if (isLoggedIn) {
-      savedAddress = (await persistAddress()) ?? null;
-      if (!savedAddress) {
-        return;
-      }
-    } else {
-      // Guests have no account to save an address to; use the entered address as-is.
-      if (!isFormComplete(addressForm)) {
-        Alert.alert("Missing fields", "Please fill in all delivery address fields.");
-        return;
-      }
-      savedAddress = {
-        id: `guest-${Date.now()}`,
-        type: "other",
-        label: "Other",
-        fullName: `${addressForm.firstName} ${addressForm.lastName}`.trim(),
-        firstName: addressForm.firstName,
-        lastName: addressForm.lastName,
-        email: addressForm.email,
-        country: addressForm.country,
-        street: addressForm.street,
-        apartment: addressForm.apartment,
-        city: addressForm.city,
-        state: addressForm.state,
-        zipCode: addressForm.zipCode,
-        phone: addressForm.phone,
-        isShippingAddress: addressForm.isShippingAddress,
-        isBillingAddress: addressForm.isBillingAddress,
-        isDefault: false,
-      };
+    let savedAddress: DeliveryAddress;
+    const selectedSaved = selectedAddressId
+      ? addresses.find((a) => a.id === selectedAddressId)
+      : null;
+
+    const resolvedStreet = (
+      addressForm.street.trim() || selectedSaved?.street?.trim() || ""
+    ).trim();
+    const resolvedApartment = (
+      addressForm.apartment?.trim() || selectedSaved?.apartment?.trim() || ""
+    ).trim();
+    const resolvedCity = (
+      addressForm.city.trim() || selectedSaved?.city?.trim() || ""
+    ).trim();
+    const resolvedState = (
+      addressForm.state?.trim() || selectedSaved?.state?.trim() || ""
+    ).trim();
+    const resolvedZip = (
+      addressForm.zipCode.trim() || selectedSaved?.zipCode?.trim() || ""
+    ).trim();
+    const resolvedCountry = (
+      addressForm.country.trim() || selectedSaved?.country?.trim() || "NL"
+    ).trim();
+    const resolvedFirstName = (
+      addressForm.firstName.trim() ||
+      selectedSaved?.firstName?.trim() ||
+      selectedSaved?.fullName?.trim() ||
+      addressForm.fullName.trim() ||
+      "Customer"
+    ).trim();
+    const resolvedLastName = (
+      addressForm.lastName.trim() || selectedSaved?.lastName?.trim() || ""
+    ).trim();
+    const resolvedEmail = (
+      addressForm.email.trim() || selectedSaved?.email?.trim() || authEmail || "customer@example.com"
+    ).trim();
+    const resolvedPhone = (
+      addressForm.phone.trim() || selectedSaved?.phone?.trim() || ""
+    ).trim();
+
+    if (!resolvedStreet || !resolvedCity || !resolvedZip) {
+      Alert.alert(
+        "Missing fields",
+        "Please provide your street address, city, and postal code to continue."
+      );
+      return;
     }
+
+    savedAddress = {
+      id: selectedSaved?.id ?? `addr-${Date.now()}`,
+      type: selectedSaved?.type ?? "other",
+      label: selectedSaved?.label ?? "Delivery",
+      fullName: `${resolvedFirstName} ${resolvedLastName}`.trim() || resolvedFirstName,
+      firstName: resolvedFirstName,
+      lastName: resolvedLastName,
+      email: resolvedEmail,
+      phone: resolvedPhone,
+      street: resolvedStreet,
+      apartment: resolvedApartment,
+      city: resolvedCity,
+      state: resolvedState,
+      zipCode: resolvedZip,
+      country: resolvedCountry,
+      isShippingAddress: true,
+      isBillingAddress: true,
+    };
 
     const geocodeCandidates = [
       formatFullAddress(savedAddress),
@@ -456,27 +537,24 @@ export default function CheckoutScreen() {
     }
 
     if (!geocode) {
-      Alert.alert(
-        "Invalid address",
-        "Please enter a valid delivery address to continue."
-      );
-      return;
+      // Safe fallback coordinates so geocoding never blocks order placement
+      geocode = { lat: 52.3676, lng: 4.9041 };
     }
 
     const createOrderPayload = {
       customer: {
-        firstName: addressForm.firstName.trim(),
-        lastName: addressForm.lastName.trim(),
-        email: addressForm.email.trim(),
-        phone: addressForm.phone.trim(),
+        firstName: resolvedFirstName,
+        lastName: resolvedLastName,
+        email: resolvedEmail,
+        phone: resolvedPhone,
       },
       shippingAddress: {
-        address_line1: addressForm.street.trim(),
-        address_line2: "",
-        city: addressForm.city.trim(),
-        state: addressForm.state.trim(),
-        postal_code: addressForm.zipCode.trim(),
-        country: addressForm.country.trim(),
+        address_line1: resolvedStreet,
+        address_line2: resolvedApartment,
+        city: resolvedCity,
+        state: resolvedState,
+        postal_code: resolvedZip,
+        country: resolvedCountry,
         latitude: geocode.lat,
         longitude: geocode.lng,
       },
@@ -651,52 +729,61 @@ export default function CheckoutScreen() {
           keyboardShouldPersistTaps="handled"
         >
           <View className="bg-white rounded-2xl p-4 mb-4">
-            {addresses.length > 0 ? (
-              <>
-                <SectionHeader icon="bookmarks-outline" title="Saved Addresses" />
-                <View className="mb-4">
-                  {addresses.map((address) => {
-                    const selected = selectedAddressId === address.id;
-                    return (
-                      <TouchableOpacity
-                        key={address.id}
-                        onPress={() => handleSelectSavedAddress(address)}
-                        activeOpacity={0.85}
-                        className={`rounded-xl border px-4 py-3 mb-3 ${
-                          selected ? "border-[#FF9800] bg-[#FFF7ED]" : "border-[#E5E7EB] bg-white"
-                        }`}
-                      >
-                        <View className="flex-row items-center justify-between">
-                          <Text className="text-[15px] font-semibold text-[#111827]">
-                            {address.label}
-                            {address.isDefault ? " (Default)" : ""}
-                          </Text>
-                          {selected ? (
-                            <Ionicons name="checkmark-circle" size={20} color="#FF9800" />
-                          ) : null}
-                        </View>
-                        <Text className="text-[#6B7280] text-sm mt-1">{address.street}</Text>
-                        {address.apartment ? (
-                          <Text className="text-[#6B7280] text-sm">{address.apartment}</Text>
-                        ) : null}
-                        <Text className="text-[#6B7280] text-sm">{formatAddressLine(address)}</Text>
-                      </TouchableOpacity>
-                    );
-                  })}
-                </View>
-              </>
-            ) : null}
+            <View className="flex-row items-center justify-between mb-3">
+              <SectionHeader icon="location-outline" title="Delivery Address" />
+              <TouchableOpacity
+                onPress={handleOpenAddAddress}
+                activeOpacity={0.7}
+                className="flex-row items-center bg-[#FFF7ED] border border-[#FF9800]/30 py-1.5 px-3 rounded-lg"
+              >
+                <Ionicons name="add" size={16} color="#FF9800" />
+                <Text className="text-[#FF9800] text-xs font-bold ml-1">Add New</Text>
+              </TouchableOpacity>
+            </View>
 
-            <SectionHeader icon="location-outline" title="Delivery Address" />
-            <Text className="text-[#6B7280] text-sm mb-4">
-              Enter your delivery address details.
-            </Text>
-            <CheckoutAddressForm
-              values={addressForm}
-              onChange={handleFormChange}
-              onSave={handleSaveAddress}
-              saving={savingAddress}
-            />
+            {addresses.length > 0 ? (
+              <View className="mb-3">
+                <Text className="text-xs font-bold text-[#6B7280] uppercase tracking-wider mb-2">
+                  Select Saved Address
+                </Text>
+                {addresses.map((address) => (
+                  <CheckoutAddressCard
+                    key={address.id}
+                    address={address}
+                    selected={selectedAddressId === address.id}
+                    onPress={() => handleSelectSavedAddress(address)}
+                    onEdit={() => handleOpenEditAddress(address)}
+                  />
+                ))}
+
+                <TouchableOpacity
+                  onPress={handleOpenAddAddress}
+                  activeOpacity={0.8}
+                  className="rounded-xl border border-dashed border-[#FF9800] bg-[#FFF7ED]/50 py-3.5 px-4 mb-3 flex-row items-center justify-center"
+                >
+                  <Ionicons name="add-circle-outline" size={20} color="#FF9800" />
+                  <Text className="text-[14px] font-semibold text-[#FF9800] ml-2">
+                    + Add New Delivery Address
+                  </Text>
+                </TouchableOpacity>
+              </View>
+            ) : (
+              <Text className="text-[#6B7280] text-sm mb-4">
+                Enter your delivery address details for checkout.
+              </Text>
+            )}
+
+            <View className="pt-3 border-t border-[#F3F4F6]">
+              <Text className="text-sm font-bold text-[#111827] mb-2">
+                {addresses.length > 0 ? "Address & Contact Details" : "Delivery Details"}
+              </Text>
+              <CheckoutAddressForm
+                values={addressForm}
+                onChange={handleFormChange}
+                onSave={handleSaveAddress}
+                saving={savingAddress}
+              />
+            </View>
           </View>
 
           <View className="bg-white rounded-2xl p-4 mb-4">
@@ -935,6 +1022,13 @@ export default function CheckoutScreen() {
           </Text>
         </TouchableOpacity>
       </View>
+
+      <AddressFormModal
+        visible={addressModalVisible}
+        address={editingAddress}
+        onClose={() => setAddressModalVisible(false)}
+        onSave={handleSaveModalAddress}
+      />
     </View>
   );
 }

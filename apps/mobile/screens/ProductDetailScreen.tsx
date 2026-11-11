@@ -12,7 +12,7 @@ import type { ProductDetail } from "@/types/product";
 import type { ProductSeller } from "@/types/seller";
 import { Ionicons } from "@expo/vector-icons";
 import { Image } from "expo-image";
-import { useLocalSearchParams, useRouter } from "expo-router";
+import { useFocusEffect, useLocalSearchParams, useRouter } from "expo-router";
 import React, { useCallback, useEffect, useState } from "react";
 import {
   ActivityIndicator,
@@ -115,7 +115,13 @@ export default function ProductDetailScreen() {
   const insets = useSafeAreaInsets();
   const { addItem } = useCart();
   const { formatPrice } = useCurrency();
-  const { isWishlisted, toggleWishlist } = useWishlist();
+  const { isWishlisted, toggleWishlist, refreshWishlist } = useWishlist();
+
+  useFocusEffect(
+    useCallback(() => {
+      refreshWishlist().catch(() => {});
+    }, [refreshWishlist])
+  );
   const [product, setProduct] = useState<ProductDetail | null>(null);
   const [loading, setLoading] = useState(true);
   const [quantity, setQuantity] = useState(1);
@@ -288,9 +294,9 @@ export default function ProductDetailScreen() {
             activeOpacity={0.8}
           >
             <Ionicons
-              name={isWishlisted(product.id) ? "heart" : "heart-outline"}
+              name={product && isWishlisted(product.id) ? "heart" : "heart-outline"}
               size={22}
-              color={isWishlisted(product.id) ? "#EF4444" : "#333333"}
+              color={product && isWishlisted(product.id) ? "#EF4444" : "#333333"}
             />
           </TouchableOpacity>
         </View>

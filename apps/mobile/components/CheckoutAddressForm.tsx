@@ -117,7 +117,7 @@ export default function CheckoutAddressForm({
         </View>
         <View className="flex-1">
           <FormField
-            label="Last Name"
+            label="Last Name (optional)"
             icon="person-outline"
             value={values.lastName}
             onChangeText={(text) => onChange("lastName", text)}
@@ -126,11 +126,18 @@ export default function CheckoutAddressForm({
         </View>
       </View>
       <FormField
-        label="Street Address"
+        label="Street Address (Address Line 1)"
         icon="location-outline"
         value={values.street}
         onChangeText={(text) => onChange("street", text)}
-        placeholder="123 Main Street, Apt 4B"
+        placeholder="123 Main Street"
+      />
+      <FormField
+        label="Apartment, Suite, Unit, etc. (Address Line 2)"
+        icon="home-outline"
+        value={values.apartment}
+        onChangeText={(text) => onChange("apartment", text)}
+        placeholder="Apt 4B, Floor 2 (optional)"
       />
       <FormField
         label="City"
@@ -142,11 +149,11 @@ export default function CheckoutAddressForm({
       <View className="flex-row gap-3">
         <View className="flex-1">
           <FormField
-            label="State"
+            label="State / Province (optional)"
             icon="map-outline"
             value={values.state}
             onChangeText={(text) => onChange("state", text)}
-            placeholder="NY"
+            placeholder="Noord-Holland"
           />
         </View>
         <View className="flex-1">
