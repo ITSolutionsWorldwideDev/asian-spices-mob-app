@@ -42,8 +42,12 @@ function useHomeSection<T>(
   const [loading, setLoading] = useState(autoLoad);
   const [loaded, setLoaded] = useState(false);
   const startedRef = useRef(false);
+  const dataRef = useRef(data);
   const loaderRef = useRef(loader);
+  const enricherRef = useRef(enricher);
+  dataRef.current = data;
   loaderRef.current = loader;
+  enricherRef.current = enricher;
 
   const load = useCallback(() => {
     if (startedRef.current) return;
@@ -52,7 +56,15 @@ function useHomeSection<T>(
     loaderRef
       .current()
       .then((result) => {
-        setData(result);
+        // Never wipe a successful list with an empty/invalid payload.
+        setData((prev) => {
+          if (Array.isArray(result)) {
+            if (result.length > 0) return result;
+            if (Array.isArray(prev) && prev.length > 0) return prev;
+            return result;
+          }
+          return result ?? prev;
+        });
       })
       .catch(console.error)
       .finally(() => {
@@ -68,18 +80,26 @@ function useHomeSection<T>(
   }, [autoLoad, load]);
 
   const enrich = useCallback(() => {
-    if (!enricher || !Array.isArray(data) || data.length === 0) {
+    const enricherFn = enricherRef.current;
+    const current = dataRef.current;
+    if (!enricherFn || !Array.isArray(current) || current.length === 0) {
       return Promise.resolve();
     }
 
-    return enricher(data)
+    const snapshot = current;
+    return enricherFn(snapshot)
       .then((enriched) => {
-        if (Array.isArray(enriched) && enriched.length > 0) {
-          setData(enriched);
-        }
+        if (!Array.isArray(enriched) || enriched.length === 0) return;
+        // Keep currently visible products if enrichment returns a worse payload.
+        setData((prev) => {
+          if (Array.isArray(prev) && prev.length > 0 && enriched.length === 0) {
+            return prev;
+          }
+          return enriched as T;
+        });
       })
       .catch(console.error);
-  }, [data, enricher]);
+  }, []);
 
   return { data, loading, loaded, load, enrich };
 }
@@ -155,25 +175,35 @@ export default function HomeScreen() {
     ratingsEnrichmentStartedRef.current = true;
     let cancelled = false;
 
-    Promise.all([
-      topProductsRef.current.enrich(),
-      newArrivalsRef.current.enrich(),
-      specialDiscountsRef.current.enrich(),
-    ])
-      .then(() => {
-        if (!cancelled) {
-          ratingsEnrichedRef.current = true;
-        }
-      })
-      .catch((error) => {
-        console.error(error);
-        if (!cancelled) {
-          ratingsEnrichmentStartedRef.current = false;
-        }
-      });
+    // Defer ratings so the first paint of product cards is not interrupted.
+    const timer = setTimeout(() => {
+      if (cancelled) return;
+
+      Promise.all([
+        topProductsRef.current.enrich(),
+        newArrivalsRef.current.enrich(),
+        specialDiscountsRef.current.enrich(),
+      ])
+        .then(() => {
+          if (!cancelled) {
+            ratingsEnrichedRef.current = true;
+          }
+        })
+        .catch((error) => {
+          console.error(error);
+          if (!cancelled) {
+            ratingsEnrichmentStartedRef.current = false;
+          }
+        });
+    }, 300);
 
     return () => {
       cancelled = true;
+      clearTimeout(timer);
+      // Allow a later focus/load cycle to retry if enrichment never finished.
+      if (!ratingsEnrichedRef.current) {
+        ratingsEnrichmentStartedRef.current = false;
+      }
     };
   }, [
     isFocused,

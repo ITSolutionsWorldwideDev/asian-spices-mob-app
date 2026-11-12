@@ -33,9 +33,10 @@ export default function ProductGridSection({
   iconBg,
   emptyMessage = "No products found.",
 }: ProductGridSectionProps) {
+  const safeProducts = Array.isArray(products) ? products : [];
   const rows: Product[][] = [];
-  for (let i = 0; i < products.length; i += 2) {
-    rows.push(products.slice(i, i + 2));
+  for (let i = 0; i < safeProducts.length; i += 2) {
+    rows.push(safeProducts.slice(i, i + 2));
   }
 
   return (
@@ -49,11 +50,11 @@ export default function ProductGridSection({
         iconBg={iconBg}
       />
       <View className="px-4">
-        {loading && products.length === 0 ? (
+        {loading && safeProducts.length === 0 ? (
           <View className="py-8 items-center">
             <ActivityIndicator size="small" color="#FF9800" />
           </View>
-        ) : products.length === 0 ? (
+        ) : safeProducts.length === 0 ? (
           <View className="bg-white border border-[#F0F0F0] rounded-2xl p-5">
             <Text className="text-[#9CA3AF] text-sm text-center">{emptyMessage}</Text>
           </View>
