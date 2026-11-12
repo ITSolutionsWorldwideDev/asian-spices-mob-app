@@ -12,7 +12,7 @@ import {
 import { enrichProductsWithRatings } from "@/features/categories/services/categoryService";
 import { resolveProductPricing } from "@/features/products/services/productPricing";
 import { enrichRecipesWithRatings } from "@/features/recipes/services/recipeService";
-import { ensureTaxRulesLoaded } from "@/features/cart/services/taxService";
+import { ensureTaxRulesLoaded } from "@/shared/services/tax/taxService";
 import type { HomeData } from "@/features/home/types/home";
 
 const PRODUCT_IMAGE_FALLBACK =
@@ -328,7 +328,9 @@ export async function getHomeReels(): Promise<HomeData["reels"]> {
 export async function getHomeTopProducts(): Promise<HomeData["topProducts"]> {
   await ensureTaxRulesLoaded();
   try {
-    const response = await apiRequest<ProductsResponse>("/api/products?sort=popular&limit=6");
+    const response = await apiRequest<ProductsResponse>(
+      "/api/products?category=all&sort=popular&limit=6",
+    );
     const products = (response.data ?? []).slice(0, 6).map((item, index) => {
       cacheProductItem(item);
       return mapApiTopProduct(item, fallbackHome.topProducts[index], index);
@@ -342,7 +344,9 @@ export async function getHomeTopProducts(): Promise<HomeData["topProducts"]> {
 export async function getHomeNewArrivals(): Promise<HomeData["newArrivals"]> {
   await ensureTaxRulesLoaded();
   try {
-    const response = await apiRequest<ProductsResponse>("/api/products?sort=newest&limit=6");
+    const response = await apiRequest<ProductsResponse>(
+      "/api/products?category=all&sort=newest&limit=6",
+    );
     const products = (response.data ?? []).slice(0, 6).map((item, index) => {
       cacheProductItem(item);
       return mapApiNewArrivalProduct(item, fallbackHome.newArrivals[index], index);
@@ -366,7 +370,7 @@ export async function getHomeSpecialDiscounts(): Promise<HomeData["specialDiscou
   await ensureTaxRulesLoaded();
   try {
     const response = await apiRequest<ProductsResponse>(
-      "/api/products?sale_only=true&sort=random&limit=5",
+      "/api/products?category=all&sale_only=true&sort=newest&limit=5",
     );
     const products = (response.data ?? []).slice(0, 5).map((item, index) => {
       cacheProductItem(item);
@@ -396,9 +400,9 @@ export async function getHomeData(): Promise<HomeData> {
       apiRequest<CategoriesResponse>("/api/categories"),
       apiRequest<RecipesResponse>("/api/recipes?limit=12"),
       fetchFeaturedRecipeItems(),
-      apiRequest<ProductsResponse>("/api/products?sale_only=true&sort=random&limit=5"),
-      apiRequest<ProductsResponse>("/api/products?sort=popular&limit=6"),
-      apiRequest<ProductsResponse>("/api/products?sort=newest&limit=6"),
+      apiRequest<ProductsResponse>("/api/products?category=all&sale_only=true&sort=newest&limit=5"),
+      apiRequest<ProductsResponse>("/api/products?category=all&sort=popular&limit=6"),
+      apiRequest<ProductsResponse>("/api/products?category=all&sort=newest&limit=6"),
       apiRequest<ProductsResponse>("/api/products?search=herbal&sort=newest&limit=6"),
       apiRequest<ProductsResponse>("/api/products?category=kitchen-appliances&sort=newest&limit=6"),
     ]);

@@ -1,4 +1,4 @@
-import { getStoredAuthUser, refreshNextAuthSession } from "@/shared/services/api/authService";
+import { getStoredAuthUser, refreshNextAuthSession } from "@/features/auth/services/authService";
 import { ApiRequestError, apiRequest } from "@/shared/services/api/httpClient";
 import { getNotificationPreferences } from "@/features/profile/services/notificationPreferencesService";
 import AsyncStorage from "@react-native-async-storage/async-storage";
@@ -9,14 +9,16 @@ import { Platform } from "react-native";
 
 const PUSH_TOKEN_STORAGE_KEY = "@asian_spices_expo_push_token";
 
-Notifications.setNotificationHandler({
-  handleNotification: async () => ({
-    shouldShowBanner: true,
-    shouldShowList: true,
-    shouldPlaySound: true,
-    shouldSetBadge: true,
-  }),
-});
+if (Platform.OS !== "web") {
+  Notifications.setNotificationHandler({
+    handleNotification: async () => ({
+      shouldShowBanner: true,
+      shouldShowList: true,
+      shouldPlaySound: true,
+      shouldSetBadge: true,
+    }),
+  });
+}
 
 async function apiRequestWithSessionRetry<T>(
   path: string,
@@ -147,12 +149,18 @@ export async function syncPushRegistration(): Promise<void> {
 export function addNotificationResponseListener(
   handler: (response: Notifications.NotificationResponse) => void,
 ) {
+  if (Platform.OS === "web") {
+    return { remove: () => {} };
+  }
   return Notifications.addNotificationResponseReceivedListener(handler);
 }
 
 export function addNotificationReceivedListener(
   handler: (notification: Notifications.Notification) => void,
 ) {
+  if (Platform.OS === "web") {
+    return { remove: () => {} };
+  }
   return Notifications.addNotificationReceivedListener(handler);
 }
 

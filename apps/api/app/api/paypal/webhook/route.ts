@@ -1,8 +1,8 @@
 // app/api/paypal/webhook/route.ts
 import { NextRequest, NextResponse } from "next/server";
 import { pool } from "@/core/db";
-import { notifyOrderEvent } from "@/core/notifications";
 import { assignNextStore, logOrderEvent, ORDER_EVENTS } from "@/core/order-routing";
+import { sendOrderConfirmationEmail } from "@/core/email-templates";
 
 // PayPal Webhook verification endpoint
 const PAYPAL_CLIENT_ID = process.env.PAYPAL_CLIENT_ID;
@@ -81,6 +81,7 @@ export async function POST(req: NextRequest) {
       }
 
       const client = await pool.connect();
+      let confirmedOrderId: string | null = null;
       try {
         await client.query("BEGIN");
 
@@ -92,6 +93,7 @@ export async function POST(req: NextRequest) {
 
         if (orderRes.rows.length && orderRes.rows[0].payment_status !== "paid") {
           const orderId = orderRes.rows[0].id;
+          confirmedOrderId = orderId;
 
           // Update order state safely to processing status rows
           await client.query(
@@ -111,15 +113,6 @@ export async function POST(req: NextRequest) {
           // ⚡ EXECUTE ASYNCHRONOUS ENGINE HANDOFF ⚡
           await assignNextStore(client, orderId);
           console.log(`Webhook fallback process successfully routed Order #${orderId} out to store networks.`);
-
-          await notifyOrderEvent({
-            orderId,
-            type: "order_placed",
-            title: "Order Placed",
-            body: "Your payment was received and your order has been placed successfully.",
-            data: { screen: "track-order" },
-            client,
-          });
         }
 
         await client.query("COMMIT");
@@ -128,6 +121,14 @@ export async function POST(req: NextRequest) {
         throw txError;
       } finally {
         client.release();
+      }
+
+      if (confirmedOrderId) {
+        try {
+          await sendOrderConfirmationEmail(confirmedOrderId);
+        } catch (emailErr) {
+          console.error("[Email Trigger Error PayPal Webhook]:", emailErr);
+        }
       }
 
       /* 
@@ -142,6 +143,31 @@ export async function POST(req: NextRequest) {
       );
       */
       console.log(`Order ${paypalOrderId} marked as paid/completed`);
+    } else if (
+      body.event_type === "PAYMENT.CAPTURE.DENIED" ||
+      body.event_type === "PAYMENT.CAPTURE.DECLINED" ||
+      body.event_type === "CHECKOUT.ORDER.VOIDED"
+    ) {
+      const paypalOrderId =
+        body.resource?.supplementary_data?.related_ids?.order_id ||
+        body.resource?.parent_payment ||
+        body.resource?.id;
+
+      if (paypalOrderId) {
+        await pool
+          .query(
+            `UPDATE store_orders
+             SET payment_status = 'failed',
+                 updated_at = NOW()
+             WHERE transaction_id = $1
+               AND payment_method = 'paypal'
+               AND payment_status != 'paid'`,
+            [paypalOrderId],
+          )
+          .catch((dbErr) =>
+            console.error("PayPal webhook failed status update error:", dbErr),
+          );
+      }
     }
 
     return NextResponse.json({ success: true });

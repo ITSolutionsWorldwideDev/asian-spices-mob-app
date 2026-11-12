@@ -1,6 +1,6 @@
 import type { ProfileData, UserProfile } from "@/features/profile/types/profile";
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import { getStoredAuthUser, refreshNextAuthSession } from "@/shared/services/api/authService";
+import { getStoredAuthUser, refreshNextAuthSession } from "@/features/auth/services/authService";
 import { ApiRequestError, apiRequest } from "@/shared/services/api/httpClient";
 
 const PROFILE_USER_STORAGE_KEY = "@asian_spices_profile_user";

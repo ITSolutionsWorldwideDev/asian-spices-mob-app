@@ -4,7 +4,7 @@ import ProfileMenuSection from "@/features/profile/components/ProfileMenuSection
 import ProfileStatCard from "@/features/profile/components/ProfileStatCard";
 import { useCart } from "@/features/cart/contexts/CartContext";
 import { useWishlist } from "@/features/wishlist/contexts/WishlistContext";
-import { logout } from "@/shared/services/api/authService";
+import { logout } from "@/features/auth/services/authService";
 import { getAddresses } from "@/features/profile/services/addressService";
 import { getOrders } from "@/features/orders/services/orderService";
 import { getProfileData } from "@/features/profile/services/profileService";

@@ -1,4 +1,4 @@
-import { getStoredAuthUser, refreshNextAuthSession } from "@/shared/services/api/authService";
+import { getStoredAuthUser, refreshNextAuthSession } from "@/features/auth/services/authService";
 import { useRouter } from "expo-router";
 import React, { useEffect, useState } from "react";
 import {

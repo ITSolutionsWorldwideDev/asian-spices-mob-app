@@ -1,6 +1,6 @@
 import type { Product } from "@/features/home/types/home";
 import React from "react";
-import { Text, View } from "react-native";
+import { ActivityIndicator, Text, View } from "react-native";
 import ProductCard from "./ProductCard";
 import SectionHeader from "./SectionHeader";
 
@@ -10,6 +10,7 @@ type ProductGridSectionProps = {
   actionLabel?: string;
   onActionPress?: () => void;
   products: Product[];
+  loading?: boolean;
   showBrand?: boolean;
   showOriginalPrice?: boolean;
   backgroundColor?: string;
@@ -24,12 +25,13 @@ export default function ProductGridSection({
   actionLabel,
   onActionPress,
   products,
+  loading = false,
   showBrand = false,
   showOriginalPrice = false,
   backgroundColor = "transparent",
   icon,
   iconBg,
-  emptyMessage,
+  emptyMessage = "No products found.",
 }: ProductGridSectionProps) {
   const rows: Product[][] = [];
   for (let i = 0; i < products.length; i += 2) {
@@ -47,7 +49,11 @@ export default function ProductGridSection({
         iconBg={iconBg}
       />
       <View className="px-4">
-        {products.length === 0 && emptyMessage ? (
+        {loading && products.length === 0 ? (
+          <View className="py-8 items-center">
+            <ActivityIndicator size="small" color="#FF9800" />
+          </View>
+        ) : products.length === 0 ? (
           <View className="bg-white border border-[#F0F0F0] rounded-2xl p-5">
             <Text className="text-[#9CA3AF] text-sm text-center">{emptyMessage}</Text>
           </View>

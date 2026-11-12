@@ -3,13 +3,15 @@
 
 import { NextResponse } from "next/server";
 import { pool } from "@/core/db";
-import { sendReturnStatusUpdateEmail } from "@/core/email-templates";
+import {
+  sendCancellationEmail,
+  sendReturnStatusUpdateEmail,
+} from "@/core/email-templates";
 import {
   FREE_SHIPPING_THRESHOLD,
+  MIN_ORDER_AMOUNT_EUR,
   SHIPPING_OPTIONS,
 } from "@/lib/pricing";
-
-const MIN_ORDER_AMOUNT_EUR = 10;
 
 export async function POST(request: Request) {
   const client = await pool.connect();
@@ -216,6 +218,17 @@ export async function POST(request: Request) {
 
       await client.query("COMMIT");
 
+      try {
+        await sendCancellationEmail(
+          orderId,
+          undefined,
+          reason,
+          comments,
+        );
+      } catch (emailErr) {
+        console.error("[Cancellation Email Error]:", emailErr);
+      }
+
       return NextResponse.json(
         {
           success: true,
@@ -358,3 +371,4 @@ export async function POST(request: Request) {
     client.release();
   }
 }
+

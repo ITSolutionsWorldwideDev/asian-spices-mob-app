@@ -87,12 +87,32 @@ function mapApiRowToCartItem(
 export async function fetchCartItemsFromApi(
   localItems: CartItem[] = [],
 ): Promise<CartItem[]> {
-  const localById = new Map(localItems.map((item) => [item.id, item]));
+  const localById = new Map(
+    localItems.map((item) => [String(item.id).trim().toLowerCase(), item])
+  );
   const payload = await apiRequest<ApiCartItemRow[]>("/api/cart");
 
-  return (Array.isArray(payload) ? payload : [])
-    .map((row) => mapApiRowToCartItem(row, localById.get(String(row.product_id ?? ""))))
+  const rawMapped = (Array.isArray(payload) ? payload : [])
+    .map((row) => {
+      const pid = String(row.product_id ?? "").trim().toLowerCase();
+      return mapApiRowToCartItem(row, localById.get(pid));
+    })
     .filter((item): item is CartItem => Boolean(item));
+
+  // Consolidate rows so multiple quantities of the same product are merged into one line item with total quantity
+  const consolidated = new Map<string, CartItem>();
+  for (const item of rawMapped) {
+    const key = String(item.id).trim().toLowerCase();
+    const existing = consolidated.get(key);
+    if (existing) {
+      existing.quantity += item.quantity;
+      if (item.price > 0) existing.price = item.price;
+    } else {
+      consolidated.set(key, { ...item });
+    }
+  }
+
+  return Array.from(consolidated.values());
 }
 
 export async function addCartItemToApi(

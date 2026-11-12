@@ -5,15 +5,15 @@ import { fetchDbProductById, getCachedDbProductById, getProductRatingStats } fro
 import {
   findHairProduct,
   hairProductToDetail,
-} from "@/features/healthyLiving/services/herbalHairProductProductsService";
+} from "@/features/healthy-living/herbal-hair/services/herbalHairProductProductsService";
 import {
   findSkinProduct,
   skinProductToDetail,
-} from "@/features/healthyLiving/services/herbalSkinProductProductsService";
+} from "@/features/healthy-living/herbal-skin/services/herbalSkinProductProductsService";
 import {
   findSupplementProduct,
   supplementProductToDetail,
-} from "@/features/healthyLiving/services/herbalSupplementProductsService";
+} from "@/features/healthy-living/herbal-supplements/services/herbalSupplementProductsService";
 import {
   getCachedApiSpecialDiscountProduct,
 } from "@/features/home/services/homeService";

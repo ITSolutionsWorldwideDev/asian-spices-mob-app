@@ -6,7 +6,7 @@ import {
   removeCartItemFromApi,
   updateCartItemDeltaInApi,
 } from "@/features/cart/services/cartService";
-import { getStoredAuthUser } from "@/shared/services/api/authService";
+import { getStoredAuthUser } from "@/features/auth/services/authService";
 import { getProductMeta } from "@/shared/services/api/productMetaCache";
 import {
   getCartItemTax,
@@ -15,7 +15,7 @@ import {
   ensureTaxRulesLoaded,
   setCachedTaxRules,
   type TaxRule,
-} from "@/features/cart/services/taxService";
+} from "@/shared/services/tax/taxService";
 import type { CartItem } from "@/features/cart/types/cart";
 import type { ProductDetail } from "@/features/products/types/product";
 import AsyncStorage from "@react-native-async-storage/async-storage";
@@ -33,6 +33,36 @@ const CART_STORAGE_KEY = "@asian_spices_cart";
 export const SHIPPING_FEE = 5.99;
 export const FREE_SHIPPING_THRESHOLD = 50;
 export const MIN_ORDER_AMOUNT_EUR = 10;
+
+export function consolidateCartItems(items: CartItem[]): CartItem[] {
+  const map = new Map<string, CartItem>();
+
+  for (const item of items) {
+    const rawId = item.id != null ? String(item.id).trim() : "";
+    const key = rawId.toLowerCase();
+    if (!key) continue;
+
+    const qty = Math.max(1, Math.round(Number(item.quantity) || 1));
+    const existing = map.get(key);
+
+    if (existing) {
+      existing.quantity += qty;
+      if (item.price > 0) existing.price = item.price;
+      if (item.image) existing.image = item.image;
+      if (item.name && item.name !== "Product") existing.name = item.name;
+      if (item.weight) existing.weight = item.weight;
+      if (item.basePrice != null) existing.basePrice = item.basePrice;
+    } else {
+      map.set(key, {
+        ...item,
+        id: rawId,
+        quantity: qty,
+      });
+    }
+  }
+
+  return Array.from(map.values());
+}
 
 type CartContextValue = {
   items: CartItem[];
@@ -60,7 +90,9 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
 
   const refreshCart = useCallback(async () => {
     const stored = await AsyncStorage.getItem(CART_STORAGE_KEY);
-    const localItems: CartItem[] = stored ? (JSON.parse(stored) as CartItem[]) : [];
+    const localItems: CartItem[] = stored
+      ? consolidateCartItems(JSON.parse(stored) as CartItem[])
+      : [];
     const authUser = await getStoredAuthUser();
 
     if (!authUser) {
@@ -69,20 +101,24 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
     }
 
     try {
-      const apiItems = await fetchCartItemsFromApi(localItems);
-      const apiIds = new Set(apiItems.map((item) => item.id));
-      const localOnly = localItems.filter((item) => !apiIds.has(item.id));
+      const rawApiItems = await fetchCartItemsFromApi(localItems);
+      const apiItems = consolidateCartItems(rawApiItems);
+      const apiIds = new Set(apiItems.map((item) => String(item.id).trim().toLowerCase()));
+      const localOnly = localItems.filter(
+        (item) => !apiIds.has(String(item.id).trim().toLowerCase())
+      );
 
       if (localOnly.length > 0) {
         await mergeLocalCartToApi(localOnly);
-        const mergedItems = await fetchCartItemsFromApi(localItems);
+        const mergedRaw = await fetchCartItemsFromApi(localItems);
+        const mergedItems = consolidateCartItems(mergedRaw);
         setItems(mergedItems);
         return;
       }
 
       setItems(apiItems);
     } catch {
-      setItems(localItems.length > 0 ? localItems : []);
+      setItems(consolidateCartItems(localItems.length > 0 ? localItems : []));
     }
   }, []);
 
@@ -103,48 +139,56 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
 
   useEffect(() => {
     if (!isHydrated) return;
-    AsyncStorage.setItem(CART_STORAGE_KEY, JSON.stringify(items)).catch(console.error);
+    AsyncStorage.setItem(CART_STORAGE_KEY, JSON.stringify(consolidateCartItems(items))).catch(console.error);
   }, [items, isHydrated]);
 
   const addItem = useCallback((product: ProductDetail, quantity = 1) => {
     const meta = getProductMeta(product.id);
     const basePrice = meta?.basePrice ?? undefined;
+    const targetId = String(product.id ?? "").trim();
+    const targetKey = targetId.toLowerCase();
+    const addQty = Math.max(1, Math.round(Number(quantity) || 1));
 
     setItems((current) => {
-      const existing = current.find((item) => item.id === product.id);
-      if (existing) {
-        return current.map((item) =>
-          item.id === product.id
-            ? { ...item, quantity: item.quantity + quantity }
+      const existingIndex = current.findIndex(
+        (item) => String(item.id ?? "").trim().toLowerCase() === targetKey
+      );
+      if (existingIndex >= 0) {
+        return current.map((item, index) =>
+          index === existingIndex
+            ? { ...item, quantity: item.quantity + addQty, price: product.price || item.price }
             : item
         );
       }
       return [
         ...current,
         {
-          id: product.id,
+          id: targetId,
           name: product.name,
           image: product.image,
           weight: product.weight,
           basePrice,
           price: product.price,
-          quantity,
+          quantity: addQty,
         },
       ];
     });
-    void addCartItemToApi(product.id, quantity, product.price).catch(() => {
+    void addCartItemToApi(targetId, addQty, product.price).catch(() => {
       // Keep local fallback if API/session is unavailable.
     });
   }, []);
 
   const updateQuantity = useCallback((productId: string, quantity: number) => {
     if (quantity < 1) return;
-    const currentItem = items.find((item) => item.id === productId);
+    const targetKey = String(productId ?? "").trim().toLowerCase();
+    const currentItem = items.find(
+      (item) => String(item.id ?? "").trim().toLowerCase() === targetKey
+    );
     const delta = currentItem ? quantity - currentItem.quantity : 0;
 
     setItems((current) =>
       current.map((item) =>
-        item.id === productId ? { ...item, quantity } : item
+        String(item.id ?? "").trim().toLowerCase() === targetKey ? { ...item, quantity } : item
       )
     );
     if (delta !== 0) {
@@ -155,7 +199,10 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
   }, [items]);
 
   const removeItem = useCallback((productId: string) => {
-    setItems((current) => current.filter((item) => item.id !== productId));
+    const targetKey = String(productId ?? "").trim().toLowerCase();
+    setItems((current) =>
+      current.filter((item) => String(item.id ?? "").trim().toLowerCase() !== targetKey)
+    );
     void removeCartItemFromApi(productId).catch(() => {
       // Keep local fallback if API/session is unavailable.
     });

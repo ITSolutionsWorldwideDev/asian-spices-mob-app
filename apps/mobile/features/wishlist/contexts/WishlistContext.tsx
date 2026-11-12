@@ -1,4 +1,4 @@
-import { getStoredAuthUser } from "@/shared/services/api/authService";
+import { getStoredAuthUser } from "@/features/auth/services/authService";
 import {
   addWishlistItemToApi,
   fetchWishlistItemsFromApi,
@@ -76,51 +76,67 @@ export function WishlistProvider({ children }: { children: React.ReactNode }) {
   }, [refreshWishlist]);
 
   const isWishlisted = useCallback(
-    (productId: string) => items.some((item) => item.id === productId),
+    (productId: string | number) => {
+      const target = String(productId ?? "").trim().toLowerCase();
+      if (!target) return false;
+      return items.some(
+        (item) => String(item.id ?? "").trim().toLowerCase() === target
+      );
+    },
     [items],
   );
 
   const toggleWishlist = useCallback(
     async (item: WishlistItem) => {
-      const exists = items.some((entry) => entry.id === item.id);
-      const previous = items;
+      const target = String(item.id ?? "").trim().toLowerCase();
+      const exists = items.some(
+        (entry) => String(entry.id ?? "").trim().toLowerCase() === target
+      );
 
-      setItems((current) => {
-        if (exists) {
-          return current.filter((entry) => entry.id !== item.id);
-        }
-        return [...current, item];
-      });
+      const nextItems = exists
+        ? items.filter((entry) => String(entry.id ?? "").trim().toLowerCase() !== target)
+        : [...items, { ...item, id: String(item.id).trim() }];
+
+      setItems(nextItems);
+      await AsyncStorage.setItem(WISHLIST_STORAGE_KEY, JSON.stringify(nextItems)).catch(console.error);
 
       try {
-        if (exists) {
-          await removeWishlistItemFromApi(item.id);
-        } else {
-          await addWishlistItemToApi(item.id);
+        const authUser = await getStoredAuthUser();
+        if (authUser) {
+          if (exists) {
+            await removeWishlistItemFromApi(String(item.id).trim());
+          } else {
+            await addWishlistItemToApi(String(item.id).trim());
+          }
+          const apiItems = await fetchWishlistItemsFromApi();
+          setItems(apiItems);
+          await AsyncStorage.setItem(WISHLIST_STORAGE_KEY, JSON.stringify(apiItems)).catch(console.error);
         }
-        const apiItems = await fetchWishlistItemsFromApi();
-        setItems(apiItems);
-        await AsyncStorage.setItem(WISHLIST_STORAGE_KEY, JSON.stringify(apiItems));
       } catch (error) {
-        setItems(previous);
-        throw error;
+        console.warn("[Wishlist] Remote sync warning:", error);
       }
     },
     [items],
   );
 
-  const removeFromWishlist = useCallback(async (productId: string) => {
-    const previous = items;
-    setItems((current) => current.filter((item) => item.id !== productId));
+  const removeFromWishlist = useCallback(async (productId: string | number) => {
+    const target = String(productId ?? "").trim().toLowerCase();
+    const nextItems = items.filter(
+      (item) => String(item.id ?? "").trim().toLowerCase() !== target
+    );
+    setItems(nextItems);
+    await AsyncStorage.setItem(WISHLIST_STORAGE_KEY, JSON.stringify(nextItems)).catch(console.error);
 
     try {
-      await removeWishlistItemFromApi(productId);
-      const apiItems = await fetchWishlistItemsFromApi();
-      setItems(apiItems);
-      await AsyncStorage.setItem(WISHLIST_STORAGE_KEY, JSON.stringify(apiItems));
+      const authUser = await getStoredAuthUser();
+      if (authUser) {
+        await removeWishlistItemFromApi(String(productId).trim());
+        const apiItems = await fetchWishlistItemsFromApi();
+        setItems(apiItems);
+        await AsyncStorage.setItem(WISHLIST_STORAGE_KEY, JSON.stringify(apiItems)).catch(console.error);
+      }
     } catch (error) {
-      setItems(previous);
-      throw error;
+      console.warn("[Wishlist] Remote remove warning:", error);
     }
   }, [items]);
 

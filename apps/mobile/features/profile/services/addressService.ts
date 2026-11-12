@@ -1,4 +1,4 @@
-import { refreshNextAuthSession } from "@/shared/services/api/authService";
+import { refreshNextAuthSession } from "@/features/auth/services/authService";
 import { ApiRequestError, apiRequest } from "@/shared/services/api/httpClient";
 import {
     ADDRESS_LABELS,

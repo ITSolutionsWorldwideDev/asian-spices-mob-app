@@ -1,5 +1,5 @@
 import preferencesJson from "@/features/profile/data/notificationPreferences.json";
-import { refreshNextAuthSession } from "@/shared/services/api/authService";
+import { refreshNextAuthSession } from "@/features/auth/services/authService";
 import { ApiRequestError, apiRequest } from "@/shared/services/api/httpClient";
 import type { NotificationPreferences } from "@/features/profile/types/notificationPreferences";
 import AsyncStorage from "@react-native-async-storage/async-storage";

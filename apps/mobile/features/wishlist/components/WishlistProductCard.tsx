@@ -1,4 +1,4 @@
-import { useCurrency } from "@/shared/contexts/CurrencyContext";
+import { useCurrency } from "@/shared/providers/CurrencyProvider";
 import type { WishlistItem } from "@/features/wishlist/types/wishlist";
 import { Ionicons } from "@expo/vector-icons";
 import { Image } from "expo-image";

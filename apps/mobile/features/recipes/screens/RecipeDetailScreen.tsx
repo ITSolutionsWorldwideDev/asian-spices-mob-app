@@ -8,7 +8,7 @@ import {
   type RecipeIngredient,
   type RecipeReviewSummary,
 } from "@/features/recipes/services/recipeService";
-import { getStoredAuthUser } from "@/shared/services/api/authService";
+import { getStoredAuthUser } from "@/features/auth/services/authService";
 import { submitRecipeReview } from "@/features/products/services/reviewService";
 import { useCart } from "@/features/cart/contexts/CartContext";
 import { getProductById } from "@/features/products/services/productService";

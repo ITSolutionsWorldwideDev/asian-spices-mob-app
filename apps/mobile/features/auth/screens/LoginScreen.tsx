@@ -2,12 +2,12 @@ import AuthTextField from "@/features/auth/components/AuthTextField";
 // import SocialButton from "@/features/auth/components/SocialButton";
 import { useCart } from "@/features/cart/contexts/CartContext";
 import { useWishlist } from "@/features/wishlist/contexts/WishlistContext";
-import { login } from "@/shared/services/api/authService";
+import { login } from "@/features/auth/services/authService";
 // import { AntDesign, FontAwesome } from "@expo/vector-icons";
+import { showAlert } from "@/shared/utils/alert";
 import { useRouter } from "expo-router";
 import React, { useState } from "react";
 import {
-  Alert,
   Image,
   KeyboardAvoidingView,
   Platform,
@@ -28,6 +28,7 @@ export default function LoginScreen() {
   const [password, setPassword] = useState("");
   const [emailError, setEmailError] = useState("");
   const [passwordError, setPasswordError] = useState("");
+  const [generalError, setGeneralError] = useState("");
   const [loading, setLoading] = useState(false);
 
   const isValidEmail = (value: string) => /\S+@\S+\.\S+/.test(value);
@@ -39,6 +40,7 @@ export default function LoginScreen() {
 
     setEmailError("");
     setPasswordError("");
+    setGeneralError("");
 
     if (!trimmedEmail) {
       setEmailError("Email is required.");
@@ -65,7 +67,8 @@ export default function LoginScreen() {
       router.replace("/(tabs)");
     } catch (error) {
       const message = error instanceof Error ? error.message : "Unable to login";
-      Alert.alert("Login failed", message);
+      setGeneralError(message);
+      showAlert("Login failed", message);
     } finally {
       setLoading(false);
     }
@@ -97,35 +100,50 @@ export default function LoginScreen() {
           </Text>
 
           <View className="gap-4">
-            <AuthTextField
-              icon="person-outline"
-              placeholder="Email"
-              value={email}
-              onChangeText={(value) => {
-                setEmail(value);
-                if (emailError) setEmailError("");
-              }}
-              keyboardType="email-address"
-              autoComplete="email"
-            />
-            {emailError ? (
-              <Text className="text-[#EF4444] text-xs -mt-2">{emailError}</Text>
-            ) : null}
-            <AuthTextField
-              icon="lock-closed-outline"
-              placeholder="Password"
-              value={password}
-              onChangeText={(value) => {
-                setPassword(value);
-                if (passwordError) setPasswordError("");
-              }}
-              isPassword
-              autoComplete="password"
-            />
-            {passwordError ? (
-              <Text className="text-[#EF4444] text-xs -mt-2">{passwordError}</Text>
-            ) : null}
+            <View>
+              <AuthTextField
+                icon="person-outline"
+                placeholder="Email"
+                value={email}
+                onChangeText={(value) => {
+                  setEmail(value);
+                  if (emailError) setEmailError("");
+                  if (generalError) setGeneralError("");
+                }}
+                keyboardType="email-address"
+                autoComplete="email"
+              />
+              {emailError ? (
+                <Text className="text-[#EF4444] text-xs mt-1.5 ml-1">{emailError}</Text>
+              ) : null}
+            </View>
+
+            <View>
+              <AuthTextField
+                icon="lock-closed-outline"
+                placeholder="Password"
+                value={password}
+                onChangeText={(value) => {
+                  setPassword(value);
+                  if (passwordError) setPasswordError("");
+                  if (generalError) setGeneralError("");
+                }}
+                isPassword
+                autoComplete="password"
+              />
+              {passwordError ? (
+                <Text className="text-[#EF4444] text-xs mt-1.5 ml-1">{passwordError}</Text>
+              ) : null}
+            </View>
           </View>
+
+          {generalError ? (
+            <View className="mt-4 p-3 bg-red-50 border border-red-200 rounded-xl">
+              <Text className="text-[#EF4444] text-xs text-center font-medium">
+                {generalError}
+              </Text>
+            </View>
+          ) : null}
 
           <TouchableOpacity
             onPress={() => router.push("/forgot-password")}
@@ -153,22 +171,6 @@ export default function LoginScreen() {
               {loading ? "Logging in..." : "Login"}
             </Text>
           </TouchableOpacity>
-
-          {/* <Text className="text-[#9CA3AF] text-sm text-center mt-10 mb-6">
-            - OR Continue with -
-          </Text>
-
-          <View className="flex-row justify-center items-center gap-5">
-            <SocialButton>
-              <AntDesign name="google" size={22} color="#EA4335" />
-            </SocialButton>
-            <SocialButton>
-              <AntDesign name="apple" size={24} color="#000000" />
-            </SocialButton>
-            <SocialButton>
-              <FontAwesome name="facebook" size={22} color="#1877F2" />
-            </SocialButton>
-          </View> */}
 
           <View className="flex-1 justify-end items-center mt-12">
             <TouchableOpacity

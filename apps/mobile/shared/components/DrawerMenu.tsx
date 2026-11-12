@@ -1,8 +1,8 @@
 import { useCart } from "@/features/cart/contexts/CartContext";
 import { useWishlist } from "@/features/wishlist/contexts/WishlistContext";
-import { useMenuDrawer } from "@/shared/contexts/MenuDrawerContext";
+import { useMenuDrawer } from "@/shared/providers/MenuDrawerProvider";
 import drawerMenuData from "@/shared/data/drawerMenu.json";
-import { logout } from "@/shared/services/api/authService";
+import { logout } from "@/features/auth/services/authService";
 import type { DrawerMenuData, DrawerNavItem, HealthyLivingItem } from "@/shared/types/drawer";
 import { Ionicons } from "@expo/vector-icons";
 import { Image } from "expo-image";

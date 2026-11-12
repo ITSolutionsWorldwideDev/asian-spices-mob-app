@@ -1,5 +1,5 @@
 import reelsJson from "@/features/reels/data/reels.json";
-import { refreshNextAuthSession } from "@/shared/services/api/authService";
+import { refreshNextAuthSession } from "@/features/auth/services/authService";
 import { ApiRequestError, apiRequest } from "@/shared/services/api/httpClient";
 import {
   extractYouTubeVideoId,

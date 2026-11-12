@@ -2,7 +2,7 @@ import { apiRequest } from "@/shared/services/api/httpClient";
 import { setProductMetaFromApiRow } from "@/shared/services/api/productMetaCache";
 import { getYouTubeThumbnail } from "@/shared/services/api/recipeVideo";
 import { cacheDbProducts, getProductRatingStats, mapApiProductToCategory } from "@/features/categories/services/categoryService";
-import { ensureTaxRulesLoaded } from "@/features/cart/services/taxService";
+import { ensureTaxRulesLoaded } from "@/shared/services/tax/taxService";
 import type { RecipeListItem } from "@/features/recipes/services/recipeService";
 import type { CategoryProduct } from "@/features/categories/types/category";
 
@@ -134,7 +134,7 @@ async function fetchProductsBySort(
   await ensureTaxRulesLoaded();
   const saleParam = saleOnly ? "&sale_only=true" : "";
   const response = await apiRequest<BackendProductsResponse>(
-    `/api/products?sort=${sort}&limit=${limit}&page=${page}${saleParam}`,
+    `/api/products?category=all&sort=${sort}&limit=${limit}&page=${page}${saleParam}`,
   );
 
   const products = await Promise.all(

@@ -1,9 +1,9 @@
 import SellerInfoModal from "@/features/products/components/SellerInfoModal";
 import SuccessPopup from "@/shared/components/SuccessPopup";
 import { useCart } from "@/features/cart/contexts/CartContext";
-import { useCurrency } from "@/shared/contexts/CurrencyContext";
+import { useCurrency } from "@/shared/providers/CurrencyProvider";
 import { toWishlistItem, useWishlist } from "@/features/wishlist/contexts/WishlistContext";
-import { getStoredAuthUser } from "@/shared/services/api/authService";
+import { getStoredAuthUser } from "@/features/auth/services/authService";
 import { clearProductRatingCache } from "@/features/categories/services/categoryService";
 import { getProductById } from "@/features/products/services/productService";
 import { submitProductReview } from "@/features/products/services/reviewService";
@@ -12,7 +12,7 @@ import type { ProductDetail } from "@/features/products/types/product";
 import type { ProductSeller } from "@/features/products/types/seller";
 import { Ionicons } from "@expo/vector-icons";
 import { Image } from "expo-image";
-import { useLocalSearchParams, useRouter } from "expo-router";
+import { useFocusEffect, useLocalSearchParams, useRouter } from "expo-router";
 import React, { useCallback, useEffect, useState } from "react";
 import {
   ActivityIndicator,
@@ -115,7 +115,13 @@ export default function ProductDetailScreen() {
   const insets = useSafeAreaInsets();
   const { addItem } = useCart();
   const { formatPrice } = useCurrency();
-  const { isWishlisted, toggleWishlist } = useWishlist();
+  const { isWishlisted, toggleWishlist, refreshWishlist } = useWishlist();
+
+  useFocusEffect(
+    useCallback(() => {
+      refreshWishlist().catch(() => {});
+    }, [refreshWishlist])
+  );
   const [product, setProduct] = useState<ProductDetail | null>(null);
   const [loading, setLoading] = useState(true);
   const [quantity, setQuantity] = useState(1);
@@ -288,9 +294,9 @@ export default function ProductDetailScreen() {
             activeOpacity={0.8}
           >
             <Ionicons
-              name={isWishlisted(product.id) ? "heart" : "heart-outline"}
+              name={product && isWishlisted(product.id) ? "heart" : "heart-outline"}
               size={22}
-              color={isWishlisted(product.id) ? "#EF4444" : "#333333"}
+              color={product && isWishlisted(product.id) ? "#EF4444" : "#333333"}
             />
           </TouchableOpacity>
         </View>
@@ -301,11 +307,11 @@ export default function ProductDetailScreen() {
         contentContainerStyle={{ paddingBottom: 24 }}
         showsVerticalScrollIndicator={false}
       >
-        <View className="relative mx-4 mt-4 rounded-2xl overflow-hidden">
+        <View className="relative mx-4 mt-4 rounded-2xl overflow-hidden bg-white border border-[#EAEAEA] p-3 items-center justify-center">
           <Image
             source={{ uri: product.image }}
-            style={{ width: "100%", height: 280 }}
-            contentFit="cover"
+            style={{ width: "100%", height: 320 }}
+            contentFit="contain"
           />
           {product.category ? (
             <View className="absolute top-3 left-3 bg-white/95 rounded-lg px-2.5 py-1.5">

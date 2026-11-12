@@ -2,7 +2,7 @@ import {
     getShippableCountries,
     type CountryOption,
 } from "@/features/profile/services/addressService";
-import { getCountryDisplayName, isCountrySelected } from "@/features/cart/services/countryService";
+import { getCountryDisplayName, isCountrySelected } from "@/shared/services/country/countryService";
 import {
     addressToFormData,
     createEmptyAddressForm,
@@ -104,16 +104,22 @@ export default function AddressFormModal({
   const handleSave = async () => {
     const payload: AddressFormData = {
       ...form,
-      type: "other",
-      fullName: "",
-      firstName: "",
-      lastName: "",
-      email: "",
-      phone: "",
+      type: form.type || "other",
+      fullName: form.fullName?.trim() || form.firstName?.trim() || "",
+      firstName: form.firstName?.trim() || form.fullName?.trim() || "",
+      lastName: form.lastName?.trim() || "",
+      apartment: form.apartment?.trim() || "",
+      street: form.street.trim(),
+      city: form.city.trim(),
+      state: form.state?.trim() || "",
+      zipCode: form.zipCode.trim(),
+      country: form.country.trim() || "NL",
+      phone: form.phone?.trim() || "",
+      email: form.email?.trim() || "",
     };
 
     if (!isAddressFormComplete(payload)) {
-      Alert.alert("Missing fields", "Please fill in all address fields.");
+      Alert.alert("Missing fields", "Please fill in street address, city, postal code, and country.");
       return;
     }
 
@@ -169,43 +175,59 @@ export default function AddressFormModal({
               >
                 <View className="mb-4">
                   <Text className="text-[13px] font-semibold text-[#111827] mb-3">
-                    Address Information
+                    Contact & Address Information
                   </Text>
                 </View>
                 <ModalField
-                  label="Street Address"
-                  value={form.street}
-                  onChangeText={(text) => updateField("street", text)}
-                  placeholder="123 Main Street, Apt 4B"
+                  label="Recipient Name (optional)"
+                  value={form.fullName || `${form.firstName} ${form.lastName}`.trim()}
+                  onChangeText={(text) => {
+                    updateField("fullName", text);
+                    updateField("firstName", text);
+                  }}
+                  placeholder="e.g. Nadeem"
                 />
                 <ModalField
-                  label="Apartment / Suite"
+                  label="Phone Number (optional)"
+                  value={form.phone}
+                  onChangeText={(text) => updateField("phone", text)}
+                  placeholder="+31 6 12345678"
+                  keyboardType="phone-pad"
+                />
+                <ModalField
+                  label="Street Address (Address Line 1)"
+                  value={form.street}
+                  onChangeText={(text) => updateField("street", text)}
+                  placeholder="e.g. Kalverstraat 10"
+                />
+                <ModalField
+                  label="Apartment, Suite, Unit, etc. (Address Line 2)"
                   value={form.apartment}
                   onChangeText={(text) => updateField("apartment", text)}
-                  placeholder="Apt 4B"
+                  placeholder="Apt 4B, Floor 2 (optional)"
                 />
                 <View className="flex-row gap-3">
                   <ModalField
                     label="City"
                     value={form.city}
                     onChangeText={(text) => updateField("city", text)}
-                    placeholder="New York"
+                    placeholder="Amsterdam"
                     className="flex-1 mb-4"
                   />
                   <ModalField
-                    label="State"
+                    label="State / Province (optional)"
                     value={form.state}
                     onChangeText={(text) => updateField("state", text)}
-                    placeholder="NY"
+                    placeholder="Noord-Holland"
                     className="flex-1 mb-4"
                   />
                 </View>
                 <View className="flex-row gap-3">
                   <ModalField
-                    label="ZIP Code"
+                    label="Postal / ZIP Code"
                     value={form.zipCode}
                     onChangeText={(text) => updateField("zipCode", text)}
-                    placeholder="3011 AB"
+                    placeholder="1012 NX"
                     className="flex-1 mb-4"
                   />
                 </View>

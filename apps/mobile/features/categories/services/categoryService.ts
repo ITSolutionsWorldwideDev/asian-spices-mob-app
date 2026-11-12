@@ -2,7 +2,7 @@ import categoriesJson from "@/features/categories/data/categories.json";
 import { apiRequest } from "@/shared/services/api/httpClient";
 import { setProductMetaFromApiRow } from "@/shared/services/api/productMetaCache";
 import { resolveProductPricing } from "@/features/products/services/productPricing";
-import { ensureTaxRulesLoaded } from "@/features/cart/services/taxService";
+import { ensureTaxRulesLoaded } from "@/shared/services/tax/taxService";
 import type {
     CategoriesPageData,
     CategoryDetailData,

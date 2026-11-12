@@ -1,4 +1,4 @@
-import { useCurrency } from "@/shared/contexts/CurrencyContext";
+import { useCurrency } from "@/shared/providers/CurrencyProvider";
 import type { CartItem } from "@/features/cart/types/cart";
 import { Ionicons } from "@expo/vector-icons";
 import { Image } from "expo-image";

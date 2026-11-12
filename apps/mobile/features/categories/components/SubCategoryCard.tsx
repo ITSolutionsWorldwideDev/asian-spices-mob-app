@@ -1,4 +1,5 @@
 import type { SubCategoryItem } from "@/features/categories/types/category";
+import { resolveCategoryImage } from "@/features/categories/services/categoryImages";
 import { Ionicons } from "@expo/vector-icons";
 import { Image } from "expo-image";
 import { LinearGradient } from "expo-linear-gradient";
@@ -19,7 +20,7 @@ export default function SubCategoryCard({ item, onPress }: SubCategoryCardProps)
     >
       <View className="relative h-[130px]">
         <Image
-          source={{ uri: item.image }}
+          source={resolveCategoryImage(item.id, item.title, item.image)}
           style={{ width: "100%", height: "100%" }}
           contentFit="cover"
         />

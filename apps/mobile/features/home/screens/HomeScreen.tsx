@@ -1,4 +1,4 @@
-import AppHeader from "@/shared/components/AppHeader";
+import { enrichProductsWithRatings } from "@/features/categories/services/categoryService";
 import CategoryGrid from "@/features/home/components/CategoryGrid";
 import FooterReviewsSection from "@/features/home/components/FooterReviewsSection";
 import HeroBanner from "@/features/home/components/HeroBanner";
@@ -7,7 +7,6 @@ import ProductGridSection from "@/features/home/components/ProductGridSection";
 import RecipeGridSection from "@/features/home/components/RecipeGridSection";
 import ReelsRow from "@/features/home/components/ReelsRow";
 import SectionHeader from "@/features/home/components/SectionHeader";
-import { enrichProductsWithRatings } from "@/features/categories/services/categoryService";
 import {
   getHomeCategories,
   getHomeFeaturedRecipes,
@@ -17,10 +16,10 @@ import {
   getHomeSpecialDiscounts,
   getHomeTopProducts,
 } from "@/features/home/services/homeService";
-import { enrichRecipesWithRatings } from "@/features/recipes/services/recipeService";
-import { getFooterReviews, type FooterReviewItem } from "@/features/products/services/reviewService";
 import type { Category, Product, Recipe, Reel } from "@/features/home/types/home";
-import { Ionicons } from "@expo/vector-icons";
+import { getFooterReviews, type FooterReviewItem } from "@/features/products/services/reviewService";
+import { enrichRecipesWithRatings } from "@/features/recipes/services/recipeService";
+import AppHeader from "@/shared/components/AppHeader";
 import { useIsFocused } from "@react-navigation/native";
 import { useRouter } from "expo-router";
 import React, { useCallback, useEffect, useRef, useState } from "react";
@@ -30,37 +29,43 @@ import {
   NativeScrollEvent,
   NativeSyntheticEvent,
   ScrollView,
-  Text,
-  TouchableOpacity,
-  View,
+  View
 } from "react-native";
 
 function useHomeSection<T>(
   loader: () => Promise<T>,
   initial: T,
   enricher?: (data: T) => Promise<T>,
+  autoLoad = false,
 ) {
   const [data, setData] = useState<T>(initial);
-  const [loading, setLoading] = useState(false);
+  const [loading, setLoading] = useState(autoLoad);
   const [loaded, setLoaded] = useState(false);
   const startedRef = useRef(false);
+  const loaderRef = useRef(loader);
+  loaderRef.current = loader;
 
   const load = useCallback(() => {
     if (startedRef.current) return;
     startedRef.current = true;
     setLoading(true);
-    loader()
+    loaderRef
+      .current()
       .then((result) => {
         setData(result);
-        setLoaded(true);
-        setLoading(false);
       })
       .catch(console.error)
       .finally(() => {
         setLoading(false);
         setLoaded(true);
       });
-  }, [loader]);
+  }, []);
+
+  useEffect(() => {
+    if (autoLoad) {
+      load();
+    }
+  }, [autoLoad, load]);
 
   const enrich = useCallback(() => {
     if (!enricher || !Array.isArray(data) || data.length === 0) {
@@ -98,11 +103,13 @@ export default function HomeScreen() {
     getHomeTopProducts,
     [],
     enrichProductsWithRatings,
+    true,
   );
   const newArrivalsSection = useHomeSection<Product[]>(
     getHomeNewArrivals,
     [],
     enrichProductsWithRatings,
+    true,
   );
   const featuredRecipesSection = useHomeSection<Recipe[]>(
     getHomeFeaturedRecipes,
@@ -113,6 +120,7 @@ export default function HomeScreen() {
     getHomeSpecialDiscounts,
     [],
     enrichProductsWithRatings,
+    true,
   );
   const footerReviewsSection = useHomeSection<FooterReviewItem[]>(getFooterReviews, []);
 
@@ -130,10 +138,6 @@ export default function HomeScreen() {
       .then(setCategories)
       .catch(console.error)
       .finally(() => setCategoriesLoading(false));
-
-    topProductsSection.load();
-    newArrivalsSection.load();
-    specialDiscountsSection.load();
   }, []);
 
   useEffect(() => {
@@ -271,18 +275,12 @@ export default function HomeScreen() {
           minHeight={180}
         >
           <View className="bg-[#FFF5F5] py-4 mb-2">
-            <View className="flex-row items-center justify-between px-4 mb-3">
-              <View>
-                <Text className="text-[17px] font-bold text-black">Trending Recipe Reels</Text>
-                <Text className="text-[13px] text-[#9CA3AF] mt-0.5">Watch & Cook</Text>
-              </View>
-              <TouchableOpacity
-                onPress={() => openReels()}
-                className="w-9 h-9 rounded-full bg-[#FF9800] justify-center items-center"
-              >
-                <Ionicons name="arrow-up" size={18} color="#FFFFFF" />
-              </TouchableOpacity>
-            </View>
+            <SectionHeader
+              title="Trending Recipe Reels"
+              subtitle="Watch & Cook"
+              actionLabel="See More"
+              onActionPress={() => openReels()}
+            />
             <ReelsRow reels={reelsSection.data} onReelPress={handleReelPress} />
           </View>
         </LazyHomeSection>
@@ -292,6 +290,7 @@ export default function HomeScreen() {
           actionLabel="See More"
           onActionPress={() => router.push("/top-products")}
           products={topProductsSection.data}
+          loading={topProductsSection.loading}
         />
 
         <ProductGridSection
@@ -300,6 +299,7 @@ export default function HomeScreen() {
           actionLabel="See More"
           onActionPress={() => router.push("/new-arrivals")}
           products={newArrivalsSection.data}
+          loading={newArrivalsSection.loading}
           backgroundColor="#F0FAF4"
           icon="sparkles-outline"
           iconBg="#DCFCE7"
@@ -327,6 +327,7 @@ export default function HomeScreen() {
           actionLabel="See More"
           onActionPress={() => router.push("/special-discounts")}
           products={specialDiscountsSection.data}
+          loading={specialDiscountsSection.loading}
           backgroundColor="#FFF5F5"
           showOriginalPrice
         />

@@ -1,8 +1,8 @@
-import { refreshNextAuthSession } from "@/shared/services/api/authService";
+import { refreshNextAuthSession } from "@/features/auth/services/authService";
 import { ApiRequestError, apiRequest } from "@/shared/services/api/httpClient";
 import { getProductMeta } from "@/shared/services/api/productMetaCache";
 import { resolveProductPricing } from "@/features/products/services/productPricing";
-import { ensureTaxRulesLoaded } from "@/features/cart/services/taxService";
+import { ensureTaxRulesLoaded } from "@/shared/services/tax/taxService";
 import type { WishlistItem } from "@/features/wishlist/types/wishlist";
 
 type WishlistApiRow = {

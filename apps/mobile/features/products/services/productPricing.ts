@@ -1,4 +1,4 @@
-import { getVatRate } from "@/features/cart/services/taxService";
+import { getVatRate } from "@/shared/services/tax/taxService";
 
 export type DbProductPricingFields = {
   base_price?: string | number | null;

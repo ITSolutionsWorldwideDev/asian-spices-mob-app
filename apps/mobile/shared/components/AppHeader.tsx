@@ -1,5 +1,5 @@
 import { useCart } from "@/features/cart/contexts/CartContext";
-import { useMenuDrawer } from "@/shared/contexts/MenuDrawerContext";
+import { useMenuDrawer } from "@/shared/providers/MenuDrawerProvider";
 import { getUnreadCount } from "@/features/profile/services/notificationService";
 import { Ionicons } from "@expo/vector-icons";
 import { LinearGradient } from "expo-linear-gradient";

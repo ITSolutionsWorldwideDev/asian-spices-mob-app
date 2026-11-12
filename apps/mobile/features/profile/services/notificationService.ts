@@ -1,4 +1,4 @@
-import { refreshNextAuthSession } from "@/shared/services/api/authService";
+import { refreshNextAuthSession } from "@/features/auth/services/authService";
 import { ApiRequestError, apiRequest } from "@/shared/services/api/httpClient";
 import type { AppNotification } from "@/features/profile/types/notification";
 
