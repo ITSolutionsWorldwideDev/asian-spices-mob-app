@@ -1,3 +1,3 @@
-import HelpSupportScreen from "@/screens/HelpSupportScreen";
+import HelpSupportScreen from "@/features/profile/screens/HelpSupportScreen";
 
 export default HelpSupportScreen;

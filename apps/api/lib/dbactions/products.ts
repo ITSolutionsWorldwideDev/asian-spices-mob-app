@@ -2,17 +2,46 @@
 
 import { pool } from "@/core/db";
 
+/** Expects the raw search term (no % wildcards). Works without a brands join. */
 function productSearchSql(index: number) {
-  // Match against name/sku as well as description, health benefits, and
-  // category name so relevant products aren't missed just because the
-  // search term isn't literally part of the product's name.
   return ` AND (
-    p.name ILIKE $${index}
-    OR COALESCE(p.sku, '') ILIKE $${index}
-    OR COALESCE(p.description, '') ILIKE $${index}
-    OR COALESCE(p.health_benefits, '') ILIKE $${index}
-    OR COALESCE(c.name, '') ILIKE $${index}
+    COALESCE(p.search_vector, ''::tsvector) @@ plainto_tsquery('english', $${index})
+    OR p.name ILIKE '%' || $${index} || '%'
+    OR COALESCE(p.sku, '') ILIKE '%' || $${index} || '%'
+    OR COALESCE(p.slug, '') ILIKE '%' || $${index} || '%'
+    OR COALESCE(p.description, '') ILIKE '%' || $${index} || '%'
+    OR COALESCE(p.health_benefits, '') ILIKE '%' || $${index} || '%'
+    OR COALESCE(c.name, '') ILIKE '%' || $${index} || '%'
+    OR CAST(p.weight AS TEXT) ILIKE '%' || $${index} || '%'
+    OR (COALESCE(p.name, '') || ' ' || COALESCE(CAST(p.weight AS TEXT), '')) ILIKE '%' || $${index} || '%'
+    OR EXISTS (
+      SELECT 1
+      FROM store_brands sb
+      WHERE sb.brand_id = p.brand_id
+        AND sb.name ILIKE '%' || $${index} || '%'
+    )
+    OR (
+      SELECT COALESCE(bool_and(
+        (COALESCE(p.name, '') || ' ' || COALESCE(CAST(p.weight AS TEXT), '') || ' ' || COALESCE(c.name, ''))
+          ILIKE '%' || w.word || '%'
+      ), false)
+      FROM unnest(regexp_split_to_array(trim($${index}), '[[:space:]]+')) AS w(word)
+      WHERE length(trim(w.word)) > 0
+    )
   )`;
+}
+
+function productSearchRankSql(index: number) {
+  return `GREATEST(
+    ts_rank(COALESCE(p.search_vector, ''::tsvector), plainto_tsquery('english', $${index})),
+    CASE WHEN p.name ILIKE '%' || $${index} || '%' THEN 1 ELSE 0 END,
+    CASE WHEN EXISTS (
+      SELECT 1 FROM store_brands sb
+      WHERE sb.brand_id = p.brand_id AND sb.name ILIKE '%' || $${index} || '%'
+    ) THEN 0.9 ELSE 0 END,
+    CASE WHEN CAST(p.weight AS TEXT) ILIKE '%' || $${index} || '%' THEN 0.8 ELSE 0 END,
+    CASE WHEN (COALESCE(p.name, '') || ' ' || COALESCE(CAST(p.weight AS TEXT), '')) ILIKE '%' || $${index} || '%' THEN 1 ELSE 0 END
+  ) AS rank`;
 }
 
 export const getProducts = async (filters: any) => {
@@ -27,14 +56,25 @@ export const getProducts = async (filters: any) => {
     page = 1,
     saleOnly = false,
     limit = 20,
+    countryCode = "NL",
   } = filters;
 
-  let values: any[] = [];
-  let index = 0;
+  let values: any[] = [String(countryCode || "NL").toUpperCase()];
+  let index = 1;
 
-  let rankField = "0 as rank";
+  let searchParamIndex: number | null = null;
+  if (search?.trim()) {
+    index++;
+    searchParamIndex = index;
+    values.push(search.trim());
+  }
 
-  // 2️⃣ Use a DISTINCT ON subquery on store_product_images to force a single row match per product
+  const rankField =
+    searchParamIndex !== null
+      ? productSearchRankSql(searchParamIndex)
+      : "0 as rank";
+
+  // Match web: include country catalog min_offered_price for pricing parity
   let query = `
     SELECT 
       p.*, 
@@ -42,8 +82,18 @@ export const getProducts = async (filters: any) => {
       c.name AS category_name,
       b.name AS brand_name,
       img.file_url AS image,
+      cat.min_offered_price,
       ${rankField}
     FROM store_products p
+    LEFT JOIN (
+      SELECT
+        spc.product_id,
+        MIN(spc.price) AS min_offered_price
+      FROM public.store_product_catalog spc
+      INNER JOIN public.store_settings ss ON ss.store_id = spc.store_id
+      WHERE ss.country_code = $1 AND spc.status = 1
+      GROUP BY spc.product_id
+    ) cat ON cat.product_id = p.id
     LEFT JOIN store_categories c ON c.id = p.category_id
     LEFT JOIN store_brands b ON b.brand_id = p.brand_id
     LEFT JOIN (
@@ -54,7 +104,7 @@ export const getProducts = async (filters: any) => {
       LEFT JOIN media md ON md.media_id = pi.url::int
       ORDER BY pi.product_id, pi.is_primary DESC, pi.id ASC
     ) img ON img.product_id = p.id
-    WHERE 1=1
+    WHERE p.status = 1
   `;
 
   if (saleOnly) {
@@ -96,15 +146,11 @@ export const getProducts = async (filters: any) => {
     query += ` AND p.base_price <= $${index}`;
     values.push(maxPrice);
   }
-  if (search?.trim()) {
-    index++;
-    values.push(`%${search.trim()}%`);
-    query += productSearchSql(index);
+  if (searchParamIndex !== null) {
+    query += productSearchSql(searchParamIndex);
   }
 
-  // 🔥 Sorting
-  const currentRankPlaceholder = search ? "$1" : "0";
-
+  // 🔥 Sorting — prefer relevance whenever a search query is active
   switch (sort) {
     case "price_asc":
       query += ` ORDER BY p.base_price ASC, p.id DESC`;
@@ -115,15 +161,21 @@ export const getProducts = async (filters: any) => {
       break;
 
     case "popular":
-      query += ` ORDER BY p.created_at DESC, p.id DESC`; // later replace with sales
+      query += searchParamIndex !== null
+        ? ` ORDER BY rank DESC, p.created_at DESC, p.id DESC`
+        : ` ORDER BY p.created_at DESC, p.id DESC`;
       break;
 
     case "relevance":
-      query += ` ORDER BY rank DESC, p.id DESC`;
+      query += searchParamIndex !== null
+        ? ` ORDER BY rank DESC, p.id DESC`
+        : ` ORDER BY p.created_at DESC, p.id DESC`;
       break;
 
     default:
-      query += ` ORDER BY p.created_at DESC, p.id DESC`;
+      query += searchParamIndex !== null
+        ? ` ORDER BY rank DESC, p.created_at DESC, p.id DESC`
+        : ` ORDER BY p.created_at DESC, p.id DESC`;
   }
 
   // 🔥 Pagination
@@ -145,7 +197,7 @@ export const getProducts = async (filters: any) => {
   return result.rows;
 };
 
-export const getProductById = async (productId: string) => {
+export const getProductById = async (productId: string, countryCode = "NL") => {
   const query = `
     SELECT 
       p.*, 
@@ -153,8 +205,18 @@ export const getProductById = async (productId: string) => {
       c.name AS category_name,
       b.name AS brand_name,
       img.file_url AS image,
+      cat.min_offered_price,
       0 as rank
     FROM store_products p
+    LEFT JOIN (
+      SELECT
+        spc.product_id,
+        MIN(spc.price) AS min_offered_price
+      FROM public.store_product_catalog spc
+      INNER JOIN public.store_settings ss ON ss.store_id = spc.store_id
+      WHERE ss.country_code = $2 AND spc.status = 1
+      GROUP BY spc.product_id
+    ) cat ON cat.product_id = p.id
     LEFT JOIN store_categories c ON c.id = p.category_id
     LEFT JOIN store_brands b ON b.brand_id = p.brand_id
     LEFT JOIN (
@@ -169,7 +231,10 @@ export const getProductById = async (productId: string) => {
     LIMIT 1
   `;
 
-  const result = await pool.query(query, [productId]);
+  const result = await pool.query(query, [
+    productId,
+    String(countryCode || "NL").toUpperCase(),
+  ]);
   return result.rows[0] ?? null;
 };
 
@@ -191,7 +256,7 @@ export const getProductsCount = async (filters: any) => {
     SELECT COUNT(DISTINCT p.id)::int AS total
     FROM store_products p
     LEFT JOIN store_categories c ON c.id = p.category_id
-    WHERE 1=1
+    WHERE p.status = 1
   `;
 
   if (saleOnly) {
@@ -233,7 +298,7 @@ export const getProductsCount = async (filters: any) => {
 
   if (search?.trim()) {
     index++;
-    values.push(`%${search.trim()}%`);
+    values.push(search.trim());
     query += productSearchSql(index);
   }
 
@@ -411,7 +476,7 @@ export const getSubcategories = async (category: string, filters: any = {}) => {
   // 🔹 Text Search Constraint
   if (search?.trim()) {
     index++;
-    values.push(`%${search.trim()}%`);
+    values.push(search.trim());
     productConditions += productSearchSql(index);
   }
 
@@ -425,10 +490,12 @@ export const getSubcategories = async (category: string, filters: any = {}) => {
     FROM store_subcategories sc
     INNER JOIN store_categories c 
       ON sc.category_id = c.id
+      AND c.status = 1
     LEFT JOIN store_products p 
       ON p.subcategory_id = sc.id 
       AND ${productConditions}
     WHERE c.slug = $1
+      AND sc.status = 1
     GROUP BY sc.id, sc.name
     ORDER BY sc.name;
   `;
@@ -468,7 +535,7 @@ export const getBrands = async (category: string, filters: any = {}) => {
 
   if (search?.trim()) {
     index++;
-    values.push(`%${search.trim()}%`);
+    values.push(search.trim());
     conditions += productSearchSql(index);
   }
 

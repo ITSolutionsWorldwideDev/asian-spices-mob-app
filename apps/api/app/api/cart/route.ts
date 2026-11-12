@@ -42,9 +42,19 @@ export async function GET() {
           p.discount_value,
           p.sale_price,
           p.promo_code,
+          cat.min_offered_price,
           img.file_url AS image 
         FROM store_cart_items sci
-        LEFT JOIN store_products p ON p.id = sci.product_id        
+        LEFT JOIN store_products p ON p.id = sci.product_id
+        LEFT JOIN (
+          SELECT
+            spc.product_id,
+            MIN(spc.price) AS min_offered_price
+          FROM public.store_product_catalog spc
+          INNER JOIN public.store_settings ss ON ss.store_id = spc.store_id
+          WHERE ss.country_code = 'NL' AND spc.status = 1
+          GROUP BY spc.product_id
+        ) cat ON cat.product_id = p.id
         LEFT JOIN (
           SELECT DISTINCT ON (pi.product_id) 
             pi.product_id, 

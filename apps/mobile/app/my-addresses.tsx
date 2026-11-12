@@ -1,3 +1,3 @@
-import MyAddressesScreen from "@/screens/MyAddressesScreen";
+import MyAddressesScreen from "@/features/profile/screens/MyAddressesScreen";
 
 export default MyAddressesScreen;

@@ -1,4 +1,4 @@
-import { verifyPaymentStatus } from "@/services/orderService";
+import { verifyPaymentStatus } from "@/features/orders/services/orderService";
 import { useLocalSearchParams, useRouter } from "expo-router";
 import React, { useEffect } from "react";
 import { ActivityIndicator, Alert, View } from "react-native";

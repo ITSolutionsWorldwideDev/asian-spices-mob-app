@@ -1,3 +1,3 @@
-import NewArrivalsScreen from "@/screens/NewArrivalsScreen";
+import NewArrivalsScreen from "@/features/home/screens/NewArrivalsScreen";
 
 export default NewArrivalsScreen;

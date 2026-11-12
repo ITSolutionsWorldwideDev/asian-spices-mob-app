@@ -1,3 +1,3 @@
-import MyOrdersScreen from "@/screens/MyOrdersScreen";
+import MyOrdersScreen from "@/features/orders/screens/MyOrdersScreen";
 
 export default MyOrdersScreen;

@@ -24,6 +24,8 @@ export async function GET(req: NextRequest) {
         o.total_amount,
         o.payment_status,
         o.order_status,
+        o.shipping_status,
+        o.fulfillment_status,
         o.routing_status,
         o.current_store_id,
         o.payment_method,
@@ -45,7 +47,8 @@ export async function GET(req: NextRequest) {
             'title', p.name,
             'price', i.price,
             'quantity', i.quantity,
-            'image', md.file_url
+            'image', md.file_url,
+            'status', COALESCE(i.status, 'pending')
           )
         ) AS cart_items
 

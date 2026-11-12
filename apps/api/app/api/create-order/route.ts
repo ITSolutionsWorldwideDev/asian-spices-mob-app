@@ -53,6 +53,7 @@ export async function POST(req: NextRequest) {
     let discountAmount = 0;
     let appliedPromoId: number | null = null;
 
+    // Match web checkout stacking: promo first, then recipe on remaining subtotal
     if (typeof promoCode === "string" && promoCode.trim()) {
       const promo = await validatePromoCode(client, promoCode, merchandiseSubtotalEur);
       if (!promo.valid) {
@@ -61,6 +62,8 @@ export async function POST(req: NextRequest) {
       discountAmount += promo.discount;
       appliedPromoId = promo.promoId;
     }
+
+    const afterPromo = Math.max(0, merchandiseSubtotalEur - discountAmount);
 
     if (typeof recipeDiscountId === "string" && recipeDiscountId.trim()) {
       if (!userId) {
@@ -74,7 +77,7 @@ export async function POST(req: NextRequest) {
         client,
         userId,
         recipeDiscountId,
-        merchandiseSubtotalEur,
+        afterPromo,
       );
 
       if (!recipeDiscount.valid) {

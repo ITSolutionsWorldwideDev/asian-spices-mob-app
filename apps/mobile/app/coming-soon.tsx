@@ -1,3 +1,3 @@
-import ComingSoonScreen from "@/screens/ComingSoonScreen";
+import ComingSoonScreen from "@/features/home/screens/ComingSoonScreen";
 
 export default ComingSoonScreen;

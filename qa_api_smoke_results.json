@@ -1,0 +1,362 @@
+﻿[
+    {
+        "Name":  "Categories",
+        "Method":  "GET",
+        "Path":  "/api/categories",
+        "Status":  200,
+        "Result":  "PASS",
+        "Notes":  "{\"categories\":[{\"id\":\"c9c75293-ff07-44e5-841d-94ebd0c7d18d\",\"name\":\"Beverages\",\"slug\":\"beverages\",\"p"
+    },
+    {
+        "Name":  "Products list",
+        "Method":  "GET",
+        "Path":  "/api/products?limit=3",
+        "Status":  200,
+        "Result":  "PASS",
+        "Notes":  "{\"data\":[{\"id\":\"ff033007-b949-4ee4-ad64-d694dffbac82\",\"store_id\":null,\"name\":\"TRS Chillies Crushed\","
+    },
+    {
+        "Name":  "Product search",
+        "Method":  "GET",
+        "Path":  "/api/products?search=chilli\u0026limit=2",
+        "Status":  200,
+        "Result":  "PASS",
+        "Notes":  "{\"data\":[{\"id\":\"ff033007-b949-4ee4-ad64-d694dffbac82\",\"store_id\":null,\"name\":\"TRS Chillies Crushed\","
+    },
+    {
+        "Name":  "Category by slug",
+        "Method":  "GET",
+        "Path":  "/api/category/beverages",
+        "Status":  200,
+        "Result":  "PASS",
+        "Notes":  "{\"category\":{\"id\":\"c9c75293-ff07-44e5-841d-94ebd0c7d18d\",\"slug\":\"beverages\",\"name\":\"Beverages\"},\"sub"
+    },
+    {
+        "Name":  "Product reviews all",
+        "Method":  "GET",
+        "Path":  "/api/products/reviews?productId=all\u0026page=1\u0026limit=3",
+        "Status":  200,
+        "Result":  "PASS",
+        "Notes":  "{\"reviews\":[{\"id\":\"d996faa2-aaef-412c-879a-96dae5e75a17\",\"rating\":5,\"comment\":\"This is absolutely de"
+    },
+    {
+        "Name":  "Currencies",
+        "Method":  "GET",
+        "Path":  "/api/currencies",
+        "Status":  200,
+        "Result":  "PASS",
+        "Notes":  "[{\"id\":\"93cb05f9-7c21-4699-aa14-cf645bd747b6\",\"name\":\"British Pound\",\"code\":\"GBP\",\"symbol\":\"Â£\",\"is_"
+    },
+    {
+        "Name":  "Countries",
+        "Method":  "GET",
+        "Path":  "/api/countries",
+        "Status":  200,
+        "Result":  "PASS",
+        "Notes":  "[{\"id\":1,\"name\":\"Afghanistan\",\"iso2\":\"AF\",\"currency_code\":\"AFN\",\"is_shippable\":false},{\"id\":2,\"name\""
+    },
+    {
+        "Name":  "Currency rate EUR",
+        "Method":  "GET",
+        "Path":  "/api/currency-rate?code=USD",
+        "Status":  200,
+        "Result":  "PASS",
+        "Notes":  "{\"rate\":\"1.086957\",\"symbol\":\"$\"}"
+    },
+    {
+        "Name":  "Tax rules NL",
+        "Method":  "GET",
+        "Path":  "/api/tax-rules?country_code=NL",
+        "Status":  200,
+        "Result":  "PASS",
+        "Notes":  "{\"rules\":[{\"id\":\"000807ac-f94e-4e62-8735-4955aa0e6e0a\",\"tax_rate\":\"9.00\",\"tax_name\":\"BTW\",\"category_"
+    },
+    {
+        "Name":  "Geocode",
+        "Method":  "GET",
+        "Path":  "/api/geocode?address=Damrak%201,Amsterdam",
+        "Status":  200,
+        "Result":  "PASS",
+        "Notes":  "{\"lat\":52.3770941,\"lng\":4.8979782,\"display_name\":\"1, Damrak, Centrum, Amsterdam, Noord-Holland, Nede"
+    },
+    {
+        "Name":  "Recipes list",
+        "Method":  "GET",
+        "Path":  "/api/recipes?limit=3",
+        "Status":  200,
+        "Result":  "PASS",
+        "Notes":  "{\"success\":true,\"items\":[{\"id\":\"06264c3f-c409-467c-b1e9-2d51a474b633\",\"title\":\"Tomato Cheese Breakfa"
+    },
+    {
+        "Name":  "Recipe search",
+        "Method":  "GET",
+        "Path":  "/api/recipes?search=egg\u0026limit=2",
+        "Status":  200,
+        "Result":  "PASS",
+        "Notes":  "{\"success\":true,\"items\":[{\"id\":\"06264c3f-c409-467c-b1e9-2d51a474b633\",\"title\":\"Tomato Cheese Breakfa"
+    },
+    {
+        "Name":  "Recipe tags",
+        "Method":  "GET",
+        "Path":  "/api/recipe-tags",
+        "Status":  200,
+        "Result":  "PASS",
+        "Notes":  "{\"success\":true,\"items\":[{\"id\":\"a0e047f3-ba90-49c9-91dc-9d478e26ee3d\",\"name\":\"Biryani\",\"slug\":\"birya"
+    },
+    {
+        "Name":  "Recipe favorites (guest)",
+        "Method":  "GET",
+        "Path":  "/api/recipe-favorites",
+        "Status":  200,
+        "Result":  "PASS",
+        "Notes":  "{\"success\":true,\"recipeIds\":[]}"
+    },
+    {
+        "Name":  "Cart GET guest",
+        "Method":  "GET",
+        "Path":  "/api/cart",
+        "Status":  200,
+        "Result":  "PASS",
+        "Notes":  "[]"
+    },
+    {
+        "Name":  "Wishlist GET guest",
+        "Method":  "GET",
+        "Path":  "/api/wishlist",
+        "Status":  200,
+        "Result":  "PASS",
+        "Notes":  "[]"
+    },
+    {
+        "Name":  "Shipping options",
+        "Method":  "GET",
+        "Path":  "/api/checkout/shipping-options?country=NL\u0026city=Amsterdam\u0026weight=1",
+        "Status":  200,
+        "Result":  "PASS",
+        "Notes":  "{\"success\":true,\"options\":[{\"id\":\"d5a48f12-639a-40ed-83b0-b62c51bf0e77\",\"name\":\"Standard\",\"code\":\"ST"
+    },
+    {
+        "Name":  "Recipe discounts list",
+        "Method":  "GET",
+        "Path":  "/api/checkout/recipe-discounts",
+        "Status":  200,
+        "Result":  "PASS",
+        "Notes":  "{\"success\":true,\"discounts\":[]}"
+    },
+    {
+        "Name":  "Promo invalid",
+        "Method":  "POST",
+        "Path":  "/api/checkout/promo",
+        "Status":  400,
+        "Result":  "PASS (expected 4xx)",
+        "Notes":  "{\"success\":false,\"error\":\"Invalid promo code.\"}"
+    },
+    {
+        "Name":  "Checkout POST only route GET",
+        "Method":  "GET",
+        "Path":  "/api/checkout",
+        "Status":  405,
+        "Result":  "PASS (expected 4xx)",
+        "Notes":  "The remote server returned an error: (405) Method Not Allowed."
+    },
+    {
+        "Name":  "Signup",
+        "Method":  "POST",
+        "Path":  "/api/auth/signup",
+        "Status":  200,
+        "Result":  "PASS",
+        "Notes":  "{\"success\":true,\"token\":\"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJhYWVlNGM0NS1kMDgxLTRjMWEtOW"
+    },
+    {
+        "Name":  "Login",
+        "Method":  "POST",
+        "Path":  "/api/auth/login",
+        "Status":  200,
+        "Result":  "PASS",
+        "Notes":  "{\"success\":true,\"token\":\"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJhYWVlNGM0NS1kMDgxLTRjMWEtOW"
+    },
+    {
+        "Name":  "Forgot password",
+        "Method":  "POST",
+        "Path":  "/api/auth/forgot-password",
+        "Status":  200,
+        "Result":  "PASS",
+        "Notes":  "{\"success\":true}"
+    },
+    {
+        "Name":  "Account orders no auth",
+        "Method":  "GET",
+        "Path":  "/api/account/orders",
+        "Status":  401,
+        "Result":  "PASS (expected 401)",
+        "Notes":  "{\"error\":\"Unauthorized\"}"
+    },
+    {
+        "Name":  "Account addresses no auth",
+        "Method":  "GET",
+        "Path":  "/api/account/addresses",
+        "Status":  401,
+        "Result":  "PASS (expected 401)",
+        "Notes":  "{\"error\":\"Unauthorized\"}"
+    },
+    {
+        "Name":  "Account profile no auth",
+        "Method":  "GET",
+        "Path":  "/api/account/profile",
+        "Status":  401,
+        "Result":  "PASS (expected 401)",
+        "Notes":  "{\"error\":\"Unauthorized\"}"
+    },
+    {
+        "Name":  "Notifications no auth",
+        "Method":  "GET",
+        "Path":  "/api/account/notifications",
+        "Status":  401,
+        "Result":  "PASS (expected 401)",
+        "Notes":  "{\"error\":\"Unauthorized\"}"
+    },
+    {
+        "Name":  "Notification prefs no auth",
+        "Method":  "GET",
+        "Path":  "/api/account/notification-preferences",
+        "Status":  401,
+        "Result":  "PASS (expected 401)",
+        "Notes":  "{\"error\":\"Unauthorized\"}"
+    },
+    {
+        "Name":  "Bibi chat",
+        "Method":  "POST",
+        "Path":  "/api/chat",
+        "Status":  200,
+        "Result":  "PASS",
+        "Notes":  "{\"reply\":\"Hi!\",\"conversationId\":\"1d0da97f-eb29-415a-b513-8d04ef536966\",\"connectionStatus\":\"connected"
+    },
+    {
+        "Name":  "Support contact",
+        "Method":  "POST",
+        "Path":  "/api/support/contact",
+        "Status":  200,
+        "Result":  "PASS",
+        "Notes":  "{\"success\":true}"
+    },
+    {
+        "Name":  "Testimonials GET (should exist for list?)",
+        "Method":  "GET",
+        "Path":  "/api/tetimonials",
+        "Status":  405,
+        "Result":  "FAIL",
+        "Notes":  "The remote server returned an error: (405) Method Not Allowed."
+    },
+    {
+        "Name":  "Testimonials POST missing fields",
+        "Method":  "POST",
+        "Path":  "/api/tetimonials",
+        "Status":  400,
+        "Result":  "PASS (expected 4xx)",
+        "Notes":  "{\"success\":false,\"message\":\"All fields are required\"}"
+    },
+    {
+        "Name":  "Get order missing id",
+        "Method":  "GET",
+        "Path":  "/api/get-order",
+        "Status":  400,
+        "Result":  "PASS (expected 4xx)",
+        "Notes":  "{\"success\":false,\"error\":\"Missing orderId\"}"
+    },
+    {
+        "Name":  "Order tracking missing",
+        "Method":  "GET",
+        "Path":  "/api/order-tracking",
+        "Status":  401,
+        "Result":  "PASS (expected 4xx)",
+        "Notes":  "{\"error\":\"Unauthorized\"}"
+    },
+    {
+        "Name":  "Order status missing",
+        "Method":  "GET",
+        "Path":  "/api/order-status",
+        "Status":  400,
+        "Result":  "PASS (expected 4xx)",
+        "Notes":  "{\"error\":\"Missing orderId\"}"
+    },
+    {
+        "Name":  "Product seller missing",
+        "Method":  "GET",
+        "Path":  "/api/products/seller",
+        "Status":  400,
+        "Result":  "PASS (expected 4xx)",
+        "Notes":  "{\"error\":\"Missing productId\"}"
+    },
+    {
+        "Name":  "Newsletter",
+        "Method":  "POST",
+        "Path":  "/api/newsletter_subscriber",
+        "Status":  200,
+        "Result":  "PASS",
+        "Notes":  "{\"success\":true,\"data\":{\"id\":13,\"email\":\"qa@example.com\",\"status\":\"subscribed\",\"subscribed_at\":\"2026"
+    },
+    {
+        "Name":  "Site access",
+        "Method":  "GET",
+        "Path":  "/api/site-access",
+        "Status":  405,
+        "Result":  "FAIL",
+        "Notes":  "The remote server returned an error: (405) Method Not Allowed."
+    },
+    {
+        "Name":  "KVK",
+        "Method":  "GET",
+        "Path":  "/api/kvk",
+        "Status":  400,
+        "Result":  "FAIL",
+        "Notes":  "{\"error\":\"Failed to fetch from KVK\"}"
+    },
+    {
+        "Name":  "Recipe preview",
+        "Method":  "GET",
+        "Path":  "/api/recipe-preview",
+        "Status":  400,
+        "Result":  "FAIL",
+        "Notes":  "{\"error\":\"Missing `url` query parameter.\"}"
+    },
+    {
+        "Name":  "Product preview",
+        "Method":  "GET",
+        "Path":  "/api/product-preview",
+        "Status":  400,
+        "Result":  "FAIL",
+        "Notes":  "{\"error\":\"Missing `url` query parameter.\"}"
+    },
+    {
+        "Name":  "Product seller with id",
+        "Method":  "GET",
+        "Path":  "/api/products/seller?productId=19812",
+        "Status":  500,
+        "Result":  "FAIL",
+        "Notes":  "{\"error\":\"Something went wrong\"}"
+    },
+    {
+        "Name":  "Product reviews by id",
+        "Method":  "GET",
+        "Path":  "/api/products/reviews?productId=19812\u0026page=1",
+        "Status":  500,
+        "Result":  "FAIL",
+        "Notes":  "{\"reviews\":[],\"total\":0,\"average\":0,\"error\":\"Something went wrong\"}"
+    },
+    {
+        "Name":  "Recipe by slug",
+        "Method":  "GET",
+        "Path":  "/api/recipes/tomato-cheese-breakfast-eggs",
+        "Status":  200,
+        "Result":  "PASS",
+        "Notes":  "{\"success\":true,\"item\":{\"id\":\"06264c3f-c409-467c-b1e9-2d51a474b633\",\"tenant_id\":null,\"category_id\":\""
+    },
+    {
+        "Name":  "Recipe reviews",
+        "Method":  "GET",
+        "Path":  "/api/recipes/reviews?recipeId=06264c3f-c409-467c-b1e9-2d51a474b633",
+        "Status":  200,
+        "Result":  "PASS",
+        "Notes":  "{\"reviews\":[{\"id\":\"9866c3ff-d2e9-44ea-9edd-feede4644d3b\",\"rating\":5,\"title\":null,\"comment\":\"Looking "
+    }
+]

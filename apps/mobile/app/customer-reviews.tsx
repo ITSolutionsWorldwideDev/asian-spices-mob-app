@@ -1,3 +1,3 @@
-import CustomerReviewsScreen from "@/screens/CustomerReviewsScreen";
+import CustomerReviewsScreen from "@/features/home/screens/CustomerReviewsScreen";
 
 export default CustomerReviewsScreen;

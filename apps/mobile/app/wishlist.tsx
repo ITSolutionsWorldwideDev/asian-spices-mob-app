@@ -1,3 +1,3 @@
-import WishlistScreen from "@/screens/WishlistScreen";
+import WishlistScreen from "@/features/wishlist/screens/WishlistScreen";
 
 export default WishlistScreen;

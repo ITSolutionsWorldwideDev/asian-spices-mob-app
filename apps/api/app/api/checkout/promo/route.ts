@@ -1,3 +1,6 @@
+// app/api/checkout/promo/route.ts
+// Aligned with asian-spices-web promo validation response + rules
+
 import { validatePromoCode } from "@/lib/promoCodes";
 import { pool } from "@/core/db";
 import { NextResponse } from "next/server";
@@ -5,31 +8,34 @@ import { NextResponse } from "next/server";
 export async function POST(request: Request) {
   try {
     const body = await request.json();
-    const code = typeof body.code === "string" ? body.code : "";
-    const subtotal = Number(body.subtotal);
+    const subtotal = Number(body.subtotal) || 0;
+    const result = await validatePromoCode(pool, String(body.code || ""), subtotal);
 
-    if (!Number.isFinite(subtotal) || subtotal <= 0) {
+    if (!result.valid) {
       return NextResponse.json(
-        { success: false, error: "Invalid order subtotal." },
+        { valid: false, success: false, error: result.error },
         { status: 400 },
       );
     }
 
-    const result = await validatePromoCode(pool, code, subtotal);
-
-    if (!result.valid) {
-      return NextResponse.json({ success: false, error: result.error }, { status: 400 });
-    }
-
+    // Web-shaped fields + mobile-friendly aliases
     return NextResponse.json({
+      valid: true,
       success: true,
       code: result.code,
-      discount: result.discount,
+      discount_type: result.discount_type,
+      discount_value: result.discount_value,
+      discount_amount: result.discount_amount,
+      discount: result.discount_amount,
     });
   } catch (error) {
-    console.error("Promo validation error:", error);
+    console.error("[Promo validation error]", error);
     return NextResponse.json(
-      { success: false, error: "Could not validate promo code." },
+      {
+        valid: false,
+        success: false,
+        error: "Couldn't validate that code right now.",
+      },
       { status: 500 },
     );
   }

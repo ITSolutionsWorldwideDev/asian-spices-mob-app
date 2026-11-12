@@ -1,3 +1,3 @@
-import ReviewOrderScreen from "@/screens/ReviewOrderScreen";
+import ReviewOrderScreen from "@/features/orders/screens/ReviewOrderScreen";
 
 export default ReviewOrderScreen;

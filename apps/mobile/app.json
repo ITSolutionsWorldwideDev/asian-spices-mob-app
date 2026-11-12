@@ -74,8 +74,9 @@
     "extra": {
       "router": {},
       "eas": {
-        "projectId": "42203a12-d07c-4486-b1bb-0e3aa9061ae4"
+        "projectId": "335896e3-c487-4b99-85e4-3778d7771093"
       }
-    }
+    },
+    "owner": "itsolutionshub2026s-team"
   }
 }

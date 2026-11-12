@@ -1,3 +1,3 @@
-import HerbalFoodSupplementsScreen from "@/screens/HerbalFoodSupplementsScreen";
+import HerbalFoodSupplementsScreen from "@/features/healthyLiving/screens/HerbalFoodSupplementsScreen";
 
 export default HerbalFoodSupplementsScreen;

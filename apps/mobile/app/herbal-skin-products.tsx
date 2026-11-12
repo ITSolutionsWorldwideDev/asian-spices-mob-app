@@ -1,3 +1,3 @@
-import HerbalSkinProductsScreen from "@/screens/HerbalSkinProductsScreen";
+import HerbalSkinProductsScreen from "@/features/healthyLiving/screens/HerbalSkinProductsScreen";
 
 export default HerbalSkinProductsScreen;

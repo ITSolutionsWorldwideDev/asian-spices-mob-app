@@ -1,3 +1,3 @@
-import HerbalSupplementCategoryScreen from "@/screens/HerbalSupplementCategoryScreen";
+import HerbalSupplementCategoryScreen from "@/features/healthyLiving/screens/HerbalSupplementCategoryScreen";
 
 export default HerbalSupplementCategoryScreen;

@@ -1,3 +1,3 @@
-import SpecialDiscountsScreen from "@/screens/SpecialDiscountsScreen";
+import SpecialDiscountsScreen from "@/features/home/screens/SpecialDiscountsScreen";
 
 export default SpecialDiscountsScreen;

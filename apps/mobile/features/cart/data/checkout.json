@@ -1,0 +1,10 @@
+{
+  "paymentMethods": [
+    {
+      "id": "paynl",
+      "title": "Pay with Pay.nl",
+      "subtitle": "Secure checkout via Pay.nl",
+      "icon": "card-outline"
+    }
+  ]
+}

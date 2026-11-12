@@ -1,3 +1,3 @@
-import NotificationsScreen from "@/screens/NotificationsScreen";
+import NotificationsScreen from "@/features/profile/screens/NotificationsScreen";
 
 export default NotificationsScreen;

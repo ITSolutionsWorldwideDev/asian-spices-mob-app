@@ -1,3 +1,3 @@
-import PaymentMethodsScreen from "@/screens/PaymentMethodsScreen";
+import PaymentMethodsScreen from "@/features/profile/screens/PaymentMethodsScreen";
 
 export default PaymentMethodsScreen;

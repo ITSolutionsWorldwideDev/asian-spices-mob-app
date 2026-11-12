@@ -13,7 +13,7 @@
         "buildType": "apk"
       },
       "env": {
-        "EXPO_PUBLIC_NEXT_API_URL": "https://asian-spices-mobile-app-backend.vercel.app"
+        "EXPO_PUBLIC_NEXT_API_URL": "https://asian-spices-mob-app-backend.vercel.app"
       }
     },
     "production": {

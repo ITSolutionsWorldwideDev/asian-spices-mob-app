@@ -1,25 +1,39 @@
-# EAS Build ignore — keep upload small (replaces .gitignore for uploads)
+# EAS Build ignore — replaces .gitignore for uploads (must include all .gitignore rules too)
+
+# Git metadata (~600MB if included)
+.git
+.git/
+**/.git
+**/.git/
 
 # Monorepo: exclude API app entirely (backend is on Vercel)
+/apps/api
+apps/api
 apps/api/
+apps/api/**
+**/apps/api
 **/apps/api/
 
 # Dependencies (EAS installs these on the build server)
+/node_modules
 node_modules/
 **/node_modules/
+apps/*/node_modules/
+packages/*/node_modules/
 
 # Build / cache
 .next/
 **/.next/
+apps/api/.next/
 .expo/
 **/.expo/
+apps/mobile/.expo/
+apps/mobile/.metro-health-check*
 dist/
 web-build/
 *.tsbuildinfo
 
 # Git / tooling
-.git/
-**/.git/
 .cursor/
 agent-transcripts/
 .claude/
@@ -30,14 +44,20 @@ agent-transcripts/
 # Env / secrets
 .env
 .env.*
+.env*.local
 **/.env
 **/.env.*
+apps/mobile/.env
+apps/api/.env
 
 # Native / OS
 .kotlin/
+/ios
+/android
 ios/
 android/
 .DS_Store
+*.orig.*
 *.pem
 *.jks
 *.p8

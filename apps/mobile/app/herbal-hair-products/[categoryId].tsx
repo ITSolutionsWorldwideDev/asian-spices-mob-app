@@ -1,3 +1,3 @@
-import HerbalHairCategoryScreen from "@/screens/HerbalHairCategoryScreen";
+import HerbalHairCategoryScreen from "@/features/healthyLiving/screens/HerbalHairCategoryScreen";
 
 export default HerbalHairCategoryScreen;

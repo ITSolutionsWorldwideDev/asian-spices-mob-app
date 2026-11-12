@@ -1,3 +1,3 @@
-import ReelsScreen from "@/screens/ReelsScreen";
+import ReelsScreen from "@/features/reels/screens/ReelsScreen";
 
 export default ReelsScreen;

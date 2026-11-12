@@ -1,3 +1,3 @@
-import NotificationPreferencesScreen from "@/screens/NotificationPreferencesScreen";
+import NotificationPreferencesScreen from "@/features/profile/screens/NotificationPreferencesScreen";
 
 export default NotificationPreferencesScreen;

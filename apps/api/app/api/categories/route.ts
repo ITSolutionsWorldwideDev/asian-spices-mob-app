@@ -10,9 +10,12 @@ export async function GET() {
         c.slug,
         COUNT(p.id)::int AS product_count
        FROM store_categories c
-       LEFT JOIN store_products p ON p.category_id = c.id
+       INNER JOIN store_products p
+         ON p.category_id = c.id
+         AND p.status = 1
        WHERE c.status = 1
        GROUP BY c.id, c.name, c.slug
+       HAVING COUNT(p.id) > 0
        ORDER BY c.name ASC`,
     );
 

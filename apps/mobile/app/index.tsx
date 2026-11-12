@@ -1,4 +1,4 @@
-import SplashScreen from "@/screens/SplashScreen";
+import SplashScreen from "@/features/auth/screens/SplashScreen";
 import "../global.css";
 
 export default function Index() {

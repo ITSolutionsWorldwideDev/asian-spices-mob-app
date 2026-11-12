@@ -45,7 +45,8 @@ export async function GET(req: NextRequest) {
             'title', p.name,
             'price', oi.price,
             'quantity', oi.quantity,
-            'image', md.file_url
+            'image', md.file_url,
+            'status', COALESCE(oi.status, 'pending')
           )
         ) AS cart_items
       FROM store_orders o

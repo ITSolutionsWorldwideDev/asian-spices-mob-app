@@ -10,9 +10,11 @@ export async function GET(req: NextRequest) {
   const { searchParams } = new URL(req.url);
   const productId = searchParams.get("id")?.trim();
 
+  const countryCode = (searchParams.get("country") || "NL").toUpperCase();
+
   if (productId) {
     try {
-      const product = await getProductById(productId);
+      const product = await getProductById(productId, countryCode);
       return NextResponse.json({ data: product ? [product] : [], total: product ? 1 : 0 });
     } catch (error) {
       console.error("API ERROR:", error);
@@ -26,17 +28,23 @@ export async function GET(req: NextRequest) {
 
   const brandIds = cleanArray(searchParams.get("brands")?.split(",") || []);
 
+  const search = searchParams.get("search");
+  const categoryParam = searchParams.get("category");
+  // Global product search should not be locked to the default "spices" category.
+  const category = categoryParam || (search?.trim() ? "all" : "spices");
+
   const filters = {
-    category: searchParams.get("category") || "spices",
+    category,
     subcategories,
     brands: brandIds,
     minPrice: searchParams.get("min"),
     maxPrice: searchParams.get("max"),
-    search: searchParams.get("search"),
+    search,
     sort: searchParams.get("sort") || "newest",
     page: Number(searchParams.get("page") || "1"),
     saleOnly: searchParams.get("sale_only") === "true",
     limit: Number(searchParams.get("limit") || "20"),
+    countryCode,
   };
 
   try {
