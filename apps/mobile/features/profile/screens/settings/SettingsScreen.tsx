@@ -3,6 +3,10 @@ import ProfileMenuSection from "@/features/profile/components/ProfileMenuSection
 import SettingsMenuItem from "@/features/profile/components/settings/SettingsMenuItem";
 import { useCurrency } from "@/shared/providers/CurrencyProvider";
 import {
+  DELETE_ACCOUNT_URL,
+  PRIVACY_POLICY_URL,
+} from "@/shared/constants/legalUrls";
+import {
   fetchCountries,
   getStoredCountry,
   resolveDefaultCountry,
@@ -22,6 +26,7 @@ import React, { useEffect, useMemo, useRef, useState } from "react";
 import {
   ActivityIndicator,
   FlatList,
+  Linking,
   Modal,
   Pressable,
   ScrollView,
@@ -261,6 +266,25 @@ export default function SettingsScreen() {
               subtitle={currencySubtitle}
               showDivider={false}
               onPress={() => setPicker("currency")}
+            />
+          </ProfileMenuSection>
+
+          <ProfileMenuSection title="LEGAL & PRIVACY">
+            <SettingsMenuItem
+              icon="document-text-outline"
+              title="Privacy Policy"
+              onPress={() => {
+                void Linking.openURL(PRIVACY_POLICY_URL);
+              }}
+            />
+            <SettingsMenuItem
+              icon="trash-outline"
+              title="Delete Account"
+              subtitle="Request account & data deletion"
+              showDivider={false}
+              onPress={() => {
+                void Linking.openURL(DELETE_ACCOUNT_URL);
+              }}
             />
           </ProfileMenuSection>
         </ScrollView>

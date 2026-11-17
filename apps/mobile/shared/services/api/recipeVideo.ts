@@ -1,7 +1,7 @@
 const YOUTUBE_THUMBNAIL_FALLBACK = "https://img.youtube.com/vi/aqz-KE-bpKQ/hqdefault.jpg";
 
 /** YouTube requires a valid embed origin/referrer in WebViews (fixes error 153). */
-export const REEL_EMBED_ORIGIN = "https://com.mavia321.asainspicesmobapp";
+export const REEL_EMBED_ORIGIN = "https://online.asianspices.app";
 
 export function buildYouTubeEmbedHtml(videoId: string, muted: boolean): string {
   const muteParam = muted ? 1 : 0;
