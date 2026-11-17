@@ -9,6 +9,10 @@ import { getAddresses } from "@/features/profile/services/addressService";
 import { getOrders } from "@/features/orders/services/orderService";
 import { getProfileData } from "@/features/profile/services/profileService";
 import type { UserProfile } from "@/features/profile/types/profile";
+import {
+  DELETE_ACCOUNT_URL,
+  PRIVACY_POLICY_URL,
+} from "@/shared/constants/legalUrls";
 import { Ionicons } from "@expo/vector-icons";
 import { Image } from "expo-image";
 import { useFocusEffect, useRouter } from "expo-router";
@@ -16,6 +20,7 @@ import React, { useCallback, useState } from "react";
 import {
   ActivityIndicator,
   Alert,
+  Linking,
   ScrollView,
   Text,
   TouchableOpacity,
@@ -238,8 +243,23 @@ export default function ProfileScreen() {
           <ProfileMenuItem
             icon="settings-outline"
             title="Settings"
-            showDivider={false}
             onPress={() => router.push("/settings")}
+          />
+          <ProfileMenuItem
+            icon="document-text-outline"
+            title="Privacy Policy"
+            onPress={() => {
+              void Linking.openURL(PRIVACY_POLICY_URL);
+            }}
+          />
+          <ProfileMenuItem
+            icon="trash-outline"
+            title="Delete Account"
+            subtitle="Request account & data deletion"
+            showDivider={false}
+            onPress={() => {
+              void Linking.openURL(DELETE_ACCOUNT_URL);
+            }}
           />
         </ProfileMenuSection>
 

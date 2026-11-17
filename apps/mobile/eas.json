@@ -17,7 +17,13 @@
       }
     },
     "production": {
-      "autoIncrement": true
+      "autoIncrement": true,
+      "android": {
+        "buildType": "app-bundle"
+      },
+      "env": {
+        "EXPO_PUBLIC_NEXT_API_URL": "https://asian-spices-mob-app-backend.vercel.app"
+      }
     }
   },
   "submit": {
