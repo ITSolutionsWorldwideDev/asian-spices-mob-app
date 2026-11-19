@@ -16,6 +16,9 @@ type ProductCardProps = {
   showOriginalPrice?: boolean;
 };
 
+const IMAGE_FALLBACK =
+  "https://images.unsplash.com/photo-1596040033229-a9821ebd058d?w=400&q=80";
+
 export default function ProductCard({
   product,
   showBrand = false,
@@ -25,19 +28,28 @@ export default function ProductCard({
   const { formatPrice } = useCurrency();
   const { addItem } = useCart();
   const [added, setAdded] = useState(false);
+  const safePrice = Number.isFinite(Number(product.price)) ? Number(product.price) : 0;
+  const safeOriginal =
+    product.originalPrice != null && Number.isFinite(Number(product.originalPrice))
+      ? Number(product.originalPrice)
+      : undefined;
+  const imageUri =
+    typeof product.image === "string" && product.image.trim().length > 0
+      ? product.image
+      : IMAGE_FALLBACK;
 
   const openProductDetail = () => {
-    router.push({ pathname: "/product/[id]", params: { id: product.id } });
+    router.push({ pathname: "/product/[id]", params: { id: String(product.id) } });
   };
 
   const handleAddToCart = (e?: { stopPropagation?: () => void }) => {
     e?.stopPropagation?.();
     const cartProduct: ProductDetail = {
-      id: product.id,
-      name: product.name,
-      image: product.image,
-      price: product.price,
-      originalPrice: product.originalPrice,
+      id: String(product.id),
+      name: product.name || "Product",
+      image: imageUri,
+      price: safePrice,
+      originalPrice: safeOriginal,
       discountPercent: typeof product.discount === "number" ? product.discount : undefined,
       discountType: product.discountType,
       discount: product.discount,
@@ -45,8 +57,8 @@ export default function ProductCard({
       brand: product.brand ?? "",
       description: "",
       inStock: true,
-      rating: product.rating,
-      reviewCount: product.reviewCount,
+      rating: Number(product.rating) || 0,
+      reviewCount: Number(product.reviewCount) || 0,
       reviews: [],
     };
     addItem(cartProduct, 1);
@@ -54,12 +66,13 @@ export default function ProductCard({
     setTimeout(() => setAdded(false), 1200);
   };
 
+  // Avoid flex-1 inside ScrollView — it can collapse cards to thin border lines.
   return (
-    <View className="flex-1 bg-white rounded-2xl border border-[#F0F0F0] overflow-hidden mb-3">
-      <TouchableOpacity onPress={openProductDetail} activeOpacity={0.85} className="flex-1 justify-between">
+    <View className="bg-white rounded-2xl border border-[#F0F0F0] overflow-hidden mb-3">
+      <TouchableOpacity onPress={openProductDetail} activeOpacity={0.85}>
         <View className="relative">
           <Image
-            source={{ uri: product.image }}
+            source={{ uri: imageUri }}
             style={{ width: "100%", height: 120 }}
             contentFit="cover"
           />
@@ -76,46 +89,44 @@ export default function ProductCard({
             >
               <Text className="text-white text-[10px] font-bold">
                 {product.discountType === "fixed"
-                  ? `-${formatPrice(product.discount)}`
+                  ? `-${formatPrice(Number(product.discount) || 0)}`
                   : `-${product.discount}%`}
               </Text>
             </View>
           ) : null}
           <View className="absolute top-2 right-2">
-            <WishlistHeartButton item={toWishlistItem(product)} />
+            <WishlistHeartButton item={toWishlistItem({ ...product, image: imageUri, price: safePrice })} />
           </View>
         </View>
 
-        <View className="p-2.5 flex-1 justify-between">
-          <View>
-            <Text className="text-[13px] font-semibold text-black leading-[18px]">
-              {product.name}
-            </Text>
-            {showBrand && product.brand ? (
-              <Text className="text-[#FF9800] text-[11px] mt-0.5">{product.brand}</Text>
+        <View className="p-2.5">
+          <Text className="text-[13px] font-semibold text-black leading-[18px]" numberOfLines={2}>
+            {product.name || "Product"}
+          </Text>
+          {showBrand && product.brand ? (
+            <Text className="text-[#FF9800] text-[11px] mt-0.5">{product.brand}</Text>
+          ) : null}
+          <View className="h-[18px] flex-row items-center mt-1">
+            {Number(product.reviewCount) > 0 ? (
+              <>
+                <Ionicons name="star" size={12} color="#FBBF24" />
+                <Text className="text-[11px] text-[#6B7280] ml-1">
+                  {(Number(product.rating) || 0).toFixed(1)} ({product.reviewCount})
+                </Text>
+              </>
             ) : null}
-            <View className="h-[18px] flex-row items-center mt-1">
-              {product.reviewCount > 0 ? (
-                <>
-                  <Ionicons name="star" size={12} color="#FBBF24" />
-                  <Text className="text-[11px] text-[#6B7280] ml-1">
-                    {(Number(product.rating) || 0).toFixed(1)} ({product.reviewCount})
-                  </Text>
-                </>
-              ) : null}
-            </View>
           </View>
 
           <View className="flex-row items-center justify-between mt-2 pt-1">
-            <View className="flex-row items-center flex-wrap flex-1 mr-2">
+            <View className="flex-row items-center flex-wrap mr-2" style={{ flexShrink: 1 }}>
               <Text className="text-[#FF9800] text-sm font-bold">
-                {formatPrice(product.price)}
+                {formatPrice(safePrice)}
               </Text>
               {showOriginalPrice &&
-              product.originalPrice &&
-              product.originalPrice > product.price ? (
+              safeOriginal != null &&
+              safeOriginal > safePrice ? (
                 <Text className="text-[#9CA3AF] text-[11px] line-through ml-1.5">
-                  {formatPrice(product.originalPrice)}
+                  {formatPrice(safeOriginal)}
                 </Text>
               ) : null}
             </View>

@@ -21,6 +21,7 @@ export const productsApi = apiSlice.injectEndpoints({
     }),
     getNewArrivals: builder.query<any[], void>({
       query: () => "/api/products?category=all&sort=newest&limit=6",
+     
       transformResponse: unwrapProductsResponse,
       providesTags: ["Product"],
     }),

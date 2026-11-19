@@ -30,6 +30,7 @@ export type DeliveryAddress = {
 
 export type AddressFormData = {
   type: AddressType;
+  label: string;
   fullName: string;
   firstName: string;
   lastName: string;
@@ -48,6 +49,7 @@ export type AddressFormData = {
 export function createEmptyAddressForm(type: AddressType = "home"): AddressFormData {
   return {
     type,
+    label: ADDRESS_LABELS[type],
     fullName: "",
     firstName: "",
     lastName: "",
@@ -79,28 +81,30 @@ export function addressToFormData(address: DeliveryAddress): AddressFormData {
   const split = splitFullName(address.fullName ?? "");
   return {
     type: address.type,
+    label: address.label?.trim() || ADDRESS_LABELS[address.type],
     fullName: address.fullName ?? "",
     firstName: address.firstName ?? split.firstName,
     lastName: address.lastName ?? split.lastName,
     email: address.email ?? "",
     country: address.country ?? "",
-    street: address.street,
+    street: address.street ?? "",
     apartment: address.apartment ?? "",
-    city: address.city,
-    state: address.state,
-    zipCode: address.zipCode,
-    phone: address.phone,
+    city: address.city ?? "",
+    state: address.state ?? "",
+    zipCode: address.zipCode ?? "",
+    phone: address.phone ?? "",
     isShippingAddress: address.isShippingAddress ?? true,
     isBillingAddress: address.isBillingAddress ?? true,
   };
 }
 
 export function isAddressFormComplete(values: AddressFormData): boolean {
+  // Keep in sync with apps/api/lib/validation/account.ts addressSchema mins
   return (
-    values.country.trim().length > 0 &&
-    values.street.trim().length > 0 &&
-    values.city.trim().length > 0 &&
-    values.zipCode.trim().length > 0 &&
+    values.country.trim().length >= 2 &&
+    values.street.trim().length >= 5 &&
+    values.city.trim().length >= 2 &&
+    values.zipCode.trim().length >= 3 &&
     (values.isShippingAddress || values.isBillingAddress)
   );
 }

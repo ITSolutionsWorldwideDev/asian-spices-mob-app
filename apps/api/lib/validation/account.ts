@@ -25,6 +25,10 @@ export const addressSchema = z
 
     country: z.string().min(2, "Country is required"),
 
+    first_name: z.string().optional(),
+    last_name: z.string().optional(),
+    phone: z.string().optional(),
+
     is_shipping_address: z.boolean().default(true),
     is_billing_address: z.boolean().default(true),
   })

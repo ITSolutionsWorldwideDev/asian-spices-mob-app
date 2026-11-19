@@ -4,6 +4,7 @@ import {
 } from "@/features/profile/services/addressService";
 import { getCountryDisplayName, isCountrySelected } from "@/shared/services/country/countryService";
 import {
+    ADDRESS_LABELS,
     addressToFormData,
     createEmptyAddressForm,
     isAddressFormComplete,
@@ -30,6 +31,8 @@ type AddressFormModalProps = {
   address?: DeliveryAddress | null;
   onClose: () => void;
   onSave: (data: AddressFormData, existingId?: string) => Promise<void>;
+  /** When true, recipient name is shown but cannot be edited. */
+  lockRecipientName?: boolean;
 };
 
 function ModalField({
@@ -39,6 +42,7 @@ function ModalField({
   placeholder,
   keyboardType,
   className,
+  editable = true,
 }: {
   label: string;
   value: string;
@@ -46,6 +50,7 @@ function ModalField({
   placeholder?: string;
   keyboardType?: "default" | "phone-pad" | "number-pad" | "email-address";
   className?: string;
+  editable?: boolean;
 }) {
   return (
     <View className={className ?? "mb-4"}>
@@ -56,7 +61,11 @@ function ModalField({
         placeholder={placeholder}
         placeholderTextColor="#9CA3AF"
         keyboardType={keyboardType}
-        className="bg-white border border-[#E5E7EB] rounded-xl px-4 h-[48px] text-[15px] text-black"
+        editable={editable}
+        selectTextOnFocus={editable}
+        className={`border border-[#E5E7EB] rounded-xl px-4 h-[48px] text-[15px] ${
+          editable ? "bg-white text-black" : "bg-[#F3F4F6] text-[#6B7280]"
+        }`}
       />
     </View>
   );
@@ -67,6 +76,7 @@ export default function AddressFormModal({
   address,
   onClose,
   onSave,
+  lockRecipientName = false,
 }: AddressFormModalProps) {
   const [form, setForm] = useState<AddressFormData>(createEmptyAddressForm());
   const [saving, setSaving] = useState(false);
@@ -102,24 +112,49 @@ export default function AddressFormModal({
   };
 
   const handleSave = async () => {
+    const fullName =
+      form.fullName?.trim() ||
+      `${form.firstName ?? ""} ${form.lastName ?? ""}`.trim();
+    const nameParts = fullName.split(/\s+/).filter(Boolean);
+
     const payload: AddressFormData = {
       ...form,
-      type: form.type || "other",
-      fullName: form.fullName?.trim() || form.firstName?.trim() || "",
-      firstName: form.firstName?.trim() || form.fullName?.trim() || "",
-      lastName: form.lastName?.trim() || "",
+      type: form.type || address?.type || "other",
+      label:
+        form.label?.trim() ||
+        address?.label?.trim() ||
+        ADDRESS_LABELS[form.type || address?.type || "other"] ||
+        "Other",
+      fullName,
+      firstName: form.firstName?.trim() || nameParts[0] || "",
+      lastName: form.lastName?.trim() || nameParts.slice(1).join(" ") || "",
       apartment: form.apartment?.trim() || "",
-      street: form.street.trim(),
-      city: form.city.trim(),
+      street: (form.street ?? "").trim(),
+      city: (form.city ?? "").trim(),
       state: form.state?.trim() || "",
-      zipCode: form.zipCode.trim(),
-      country: form.country.trim() || "NL",
+      zipCode: (form.zipCode ?? "").trim(),
+      country: (form.country ?? "").trim() || "NL",
       phone: form.phone?.trim() || "",
       email: form.email?.trim() || "",
+      isShippingAddress: Boolean(form.isShippingAddress),
+      isBillingAddress: Boolean(form.isBillingAddress),
     };
 
+    if (!payload.isShippingAddress && !payload.isBillingAddress) {
+      payload.isShippingAddress = true;
+      payload.isBillingAddress = true;
+    }
+
     if (!isAddressFormComplete(payload)) {
-      Alert.alert("Missing fields", "Please fill in street address, city, postal code, and country.");
+      Alert.alert(
+        "Missing fields",
+        "Please fill in street (min 5 chars), city, postal code (min 3 chars), and country."
+      );
+      return;
+    }
+
+    if (payload.label.trim().length < 2) {
+      Alert.alert("Missing fields", "Please enter an address label (e.g. Home).");
       return;
     }
 
@@ -127,8 +162,12 @@ export default function AddressFormModal({
     try {
       await onSave(payload, address?.id);
       onClose();
-    } catch {
-      Alert.alert("Error", "Could not save your address. Please try again.");
+    } catch (error) {
+      const message =
+        error instanceof Error && error.message.trim()
+          ? error.message
+          : "Could not save your address. Please try again.";
+      Alert.alert("Error", message);
     } finally {
       setSaving(false);
     }
@@ -179,13 +218,26 @@ export default function AddressFormModal({
                   </Text>
                 </View>
                 <ModalField
+                  label="Address Label"
+                  value={form.label}
+                  onChangeText={(text) => updateField("label", text)}
+                  placeholder="e.g. Home, Office, City road"
+                />
+                <ModalField
                   label="Recipient Name (optional)"
                   value={form.fullName || `${form.firstName} ${form.lastName}`.trim()}
                   onChangeText={(text) => {
-                    updateField("fullName", text);
-                    updateField("firstName", text);
+                    if (lockRecipientName) return;
+                    const parts = text.trim().split(/\s+/).filter(Boolean);
+                    setForm((current) => ({
+                      ...current,
+                      fullName: text,
+                      firstName: parts[0] || "",
+                      lastName: parts.slice(1).join(" "),
+                    }));
                   }}
                   placeholder="e.g. Nadeem"
+                  editable={!lockRecipientName}
                 />
                 <ModalField
                   label="Phone Number (optional)"

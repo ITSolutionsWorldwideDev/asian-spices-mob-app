@@ -16,6 +16,43 @@ type ApiRequestOptions = Omit<RequestInit, "body"> & {
 
 const REQUEST_TIMEOUT_MS = 10000;
 
+function toErrorMessage(value: unknown, fallback = "Request failed"): string {
+  if (typeof value === "string" && value.trim()) {
+    return value;
+  }
+
+  if (value && typeof value === "object") {
+    const record = value as {
+      message?: unknown;
+      formErrors?: unknown;
+      fieldErrors?: Record<string, unknown>;
+    };
+
+    if (typeof record.message === "string" && record.message.trim()) {
+      return record.message;
+    }
+
+    if (record.fieldErrors && typeof record.fieldErrors === "object") {
+      for (const messages of Object.values(record.fieldErrors)) {
+        if (!Array.isArray(messages)) continue;
+        const first = messages.find(
+          (item) => typeof item === "string" && item.trim().length > 0,
+        );
+        if (typeof first === "string") return first;
+      }
+    }
+
+    if (Array.isArray(record.formErrors)) {
+      const first = record.formErrors.find(
+        (item) => typeof item === "string" && item.trim().length > 0,
+      );
+      if (typeof first === "string") return first;
+    }
+  }
+
+  return fallback;
+}
+
 export async function apiRequest<T>(path: string, options: ApiRequestOptions = {}): Promise<T> {
   let response: Response;
   const controller = new AbortController();
@@ -47,13 +84,13 @@ export async function apiRequest<T>(path: string, options: ApiRequestOptions = {
   }
 
   const payload = (await response.json().catch(() => ({}))) as {
-    error?: string;
-    message?: string;
+    error?: unknown;
+    message?: unknown;
   } & T;
 
   if (!response.ok) {
     throw new ApiRequestError(
-      payload.error ?? payload.message ?? "Request failed",
+      toErrorMessage(payload.error ?? payload.message),
       response.status,
     );
   }

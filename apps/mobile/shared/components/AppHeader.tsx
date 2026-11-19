@@ -22,7 +22,7 @@ export default function AppHeader({
   const insets = useSafeAreaInsets();
   const router = useRouter();
   const { openDrawer } = useMenuDrawer();
-  const { itemCount } = useCart();
+  const { uniqueItemCount } = useCart();
   const [unreadCount, setUnreadCount] = useState(0);
 
   useFocusEffect(
@@ -88,10 +88,10 @@ export default function AppHeader({
         >
           <View>
             <Ionicons name="cart-outline" size={24} color="#FFFFFF" />
-            {itemCount > 0 ? (
+            {uniqueItemCount > 0 ? (
               <View className="absolute -top-1.5 -right-2 min-w-[18px] h-[18px] rounded-full bg-white justify-center items-center px-1">
                 <Text className="text-[#FF9800] text-[10px] font-bold">
-                  {itemCount > 99 ? "99+" : itemCount}
+                  {uniqueItemCount > 99 ? "99+" : uniqueItemCount}
                 </Text>
               </View>
             ) : null}

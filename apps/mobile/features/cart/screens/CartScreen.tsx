@@ -11,7 +11,15 @@ export default function CartScreen() {
   const router = useRouter();
   const insets = useSafeAreaInsets();
   const { formatPrice } = useCurrency();
-  const { items, itemCount, subtotal, taxTotal, getItemVatPercent, updateQuantity, removeItem } = useCart();
+  const {
+    items,
+    uniqueItemCount,
+    subtotal,
+    taxTotal,
+    getItemVatPercent,
+    updateQuantity,
+    removeItem,
+  } = useCart();
   const displayItems = useMemo(() => consolidateCartItems(items), [items]);
 
   const total = subtotal;
@@ -34,7 +42,7 @@ export default function CartScreen() {
             <Ionicons name="chevron-back" size={26} color="#333333" />
           </TouchableOpacity>
           <Text className="flex-1 text-center text-[18px] font-bold text-black mr-9">
-            Shopping Cart{!isEmpty ? ` (${itemCount})` : ""}
+            Shopping Cart{!isEmpty ? ` (${uniqueItemCount})` : ""}
           </Text>
         </View>
       </View>

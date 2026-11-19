@@ -33,7 +33,7 @@ export default function ProductGridSection({
   iconBg,
   emptyMessage = "No products found.",
 }: ProductGridSectionProps) {
-  const safeProducts = Array.isArray(products) ? products : [];
+  const safeProducts = Array.isArray(products) ? products.filter((p) => p && p.id) : [];
   const rows: Product[][] = [];
   for (let i = 0; i < safeProducts.length; i += 2) {
     rows.push(safeProducts.slice(i, i + 2));
@@ -60,9 +60,9 @@ export default function ProductGridSection({
           </View>
         ) : (
           rows.map((row, rowIndex) => (
-            <View key={rowIndex} className="flex-row gap-3">
+            <View key={`row-${rowIndex}`} className="flex-row gap-3">
               {row.map((product) => (
-                <View key={product.id} className="flex-1">
+                <View key={String(product.id)} style={{ flex: 1 }}>
                   <ProductCard
                     product={product}
                     showBrand={showBrand}
@@ -70,7 +70,7 @@ export default function ProductGridSection({
                   />
                 </View>
               ))}
-              {row.length === 1 ? <View className="flex-1" /> : null}
+              {row.length === 1 ? <View style={{ flex: 1 }} /> : null}
             </View>
           ))
         )}

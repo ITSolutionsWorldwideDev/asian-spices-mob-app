@@ -1,4 +1,3 @@
-import { enrichProductsWithRatings } from "@/features/categories/services/categoryService";
 import CategoryGrid from "@/features/home/components/CategoryGrid";
 import FooterReviewsSection from "@/features/home/components/FooterReviewsSection";
 import HeroBanner from "@/features/home/components/HeroBanner";
@@ -7,6 +6,7 @@ import ProductGridSection from "@/features/home/components/ProductGridSection";
 import RecipeGridSection from "@/features/home/components/RecipeGridSection";
 import ReelsRow from "@/features/home/components/ReelsRow";
 import SectionHeader from "@/features/home/components/SectionHeader";
+import homeJson from "@/features/home/data/home.json";
 import {
   getHomeCategories,
   getHomeFeaturedRecipes,
@@ -16,11 +16,10 @@ import {
   getHomeSpecialDiscounts,
   getHomeTopProducts,
 } from "@/features/home/services/homeService";
-import type { Category, Product, Recipe, Reel } from "@/features/home/types/home";
+import type { Category, HomeData, Product, Recipe, Reel } from "@/features/home/types/home";
 import { getFooterReviews, type FooterReviewItem } from "@/features/products/services/reviewService";
 import { enrichRecipesWithRatings } from "@/features/recipes/services/recipeService";
 import AppHeader from "@/shared/components/AppHeader";
-import { useIsFocused } from "@react-navigation/native";
 import { useRouter } from "expo-router";
 import React, { useCallback, useEffect, useRef, useState } from "react";
 import {
@@ -29,8 +28,11 @@ import {
   NativeScrollEvent,
   NativeSyntheticEvent,
   ScrollView,
-  View
+  View,
 } from "react-native";
+
+const fallbackHome = homeJson as HomeData;
+const SECTION_LOAD_TIMEOUT_MS = 8000;
 
 function useHomeSection<T>(
   loader: () => Promise<T>,
@@ -39,7 +41,7 @@ function useHomeSection<T>(
   autoLoad = false,
 ) {
   const [data, setData] = useState<T>(initial);
-  const [loading, setLoading] = useState(autoLoad);
+  const [loading, setLoading] = useState(autoLoad && !(Array.isArray(initial) && initial.length > 0));
   const [loaded, setLoaded] = useState(false);
   const startedRef = useRef(false);
   const dataRef = useRef(data);
@@ -53,23 +55,40 @@ function useHomeSection<T>(
     if (startedRef.current) return;
     startedRef.current = true;
     setLoading(true);
-    loaderRef
-      .current()
-      .then((result) => {
-        // Never wipe a successful list with an empty/invalid payload.
+
+    let settled = false;
+    const finish = (result?: T) => {
+      if (settled) return;
+      settled = true;
+      if (result !== undefined) {
         setData((prev) => {
           if (Array.isArray(result)) {
             if (result.length > 0) return result;
             if (Array.isArray(prev) && prev.length > 0) return prev;
             return result;
           }
-          return result ?? prev;
+          return (result ?? prev) as T;
         });
+      }
+      setLoading(false);
+      setLoaded(true);
+    };
+
+    const timeoutId = setTimeout(() => {
+      // Keep whatever is already on screen (fallback/cache) if API hangs.
+      finish();
+    }, SECTION_LOAD_TIMEOUT_MS);
+
+    loaderRef
+      .current()
+      .then((result) => {
+        clearTimeout(timeoutId);
+        finish(result);
       })
-      .catch(console.error)
-      .finally(() => {
-        setLoading(false);
-        setLoaded(true);
+      .catch((error) => {
+        clearTimeout(timeoutId);
+        console.error(error);
+        finish();
       });
   }, []);
 
@@ -86,17 +105,10 @@ function useHomeSection<T>(
       return Promise.resolve();
     }
 
-    const snapshot = current;
-    return enricherFn(snapshot)
+    return enricherFn(current)
       .then((enriched) => {
         if (!Array.isArray(enriched) || enriched.length === 0) return;
-        // Keep currently visible products if enrichment returns a worse payload.
-        setData((prev) => {
-          if (Array.isArray(prev) && prev.length > 0 && enriched.length === 0) {
-            return prev;
-          }
-          return enriched as T;
-        });
+        setData(enriched as T);
       })
       .catch(console.error);
   }, []);
@@ -106,10 +118,7 @@ function useHomeSection<T>(
 
 export default function HomeScreen() {
   const router = useRouter();
-  const isFocused = useIsFocused();
   const hero = getHomeHero();
-  const ratingsEnrichedRef = useRef(false);
-  const ratingsEnrichmentStartedRef = useRef(false);
   const recipeRatingsEnrichedRef = useRef(false);
   const recipeRatingsEnrichmentStartedRef = useRef(false);
   const [scrollY, setScrollY] = useState(0);
@@ -119,16 +128,17 @@ export default function HomeScreen() {
   const [categoriesLoading, setCategoriesLoading] = useState(true);
 
   const reelsSection = useHomeSection<Reel[]>(getHomeReels, []);
+  // Seed with local fallback so sections never render as blank lines while API loads.
   const topProductsSection = useHomeSection<Product[]>(
     getHomeTopProducts,
-    [],
-    enrichProductsWithRatings,
+    fallbackHome.topProducts,
+    undefined,
     true,
   );
   const newArrivalsSection = useHomeSection<Product[]>(
     getHomeNewArrivals,
-    [],
-    enrichProductsWithRatings,
+    fallbackHome.newArrivals,
+    undefined,
     true,
   );
   const featuredRecipesSection = useHomeSection<Recipe[]>(
@@ -138,18 +148,12 @@ export default function HomeScreen() {
   );
   const specialDiscountsSection = useHomeSection<Product[]>(
     getHomeSpecialDiscounts,
-    [],
-    enrichProductsWithRatings,
+    fallbackHome.specialDiscounts,
+    undefined,
     true,
   );
   const footerReviewsSection = useHomeSection<FooterReviewItem[]>(getFooterReviews, []);
 
-  const topProductsRef = useRef(topProductsSection);
-  topProductsRef.current = topProductsSection;
-  const newArrivalsRef = useRef(newArrivalsSection);
-  newArrivalsRef.current = newArrivalsSection;
-  const specialDiscountsRef = useRef(specialDiscountsSection);
-  specialDiscountsRef.current = specialDiscountsSection;
   const featuredRecipesRef = useRef(featuredRecipesSection);
   featuredRecipesRef.current = featuredRecipesSection;
 
@@ -161,59 +165,6 @@ export default function HomeScreen() {
   }, []);
 
   useEffect(() => {
-    if (!isFocused) return;
-
-    const productSectionsReady =
-      topProductsSection.loaded &&
-      newArrivalsSection.loaded &&
-      specialDiscountsSection.loaded;
-
-    if (!productSectionsReady || ratingsEnrichedRef.current || ratingsEnrichmentStartedRef.current) {
-      return;
-    }
-
-    ratingsEnrichmentStartedRef.current = true;
-    let cancelled = false;
-
-    // Defer ratings so the first paint of product cards is not interrupted.
-    const timer = setTimeout(() => {
-      if (cancelled) return;
-
-      Promise.all([
-        topProductsRef.current.enrich(),
-        newArrivalsRef.current.enrich(),
-        specialDiscountsRef.current.enrich(),
-      ])
-        .then(() => {
-          if (!cancelled) {
-            ratingsEnrichedRef.current = true;
-          }
-        })
-        .catch((error) => {
-          console.error(error);
-          if (!cancelled) {
-            ratingsEnrichmentStartedRef.current = false;
-          }
-        });
-    }, 300);
-
-    return () => {
-      cancelled = true;
-      clearTimeout(timer);
-      // Allow a later focus/load cycle to retry if enrichment never finished.
-      if (!ratingsEnrichedRef.current) {
-        ratingsEnrichmentStartedRef.current = false;
-      }
-    };
-  }, [
-    isFocused,
-    topProductsSection.loaded,
-    newArrivalsSection.loaded,
-    specialDiscountsSection.loaded,
-  ]);
-
-  useEffect(() => {
-    if (!isFocused) return;
     if (!featuredRecipesSection.loaded) return;
     if (recipeRatingsEnrichedRef.current || recipeRatingsEnrichmentStartedRef.current) {
       return;
@@ -239,7 +190,7 @@ export default function HomeScreen() {
     return () => {
       cancelled = true;
     };
-  }, [isFocused, featuredRecipesSection.loaded]);
+  }, [featuredRecipesSection.loaded]);
 
   const handleScroll = (event: NativeSyntheticEvent<NativeScrollEvent>) => {
     setScrollY(event.nativeEvent.contentOffset.y);

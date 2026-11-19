@@ -72,11 +72,13 @@ function isFormComplete(values: AddressFormData): boolean {
   const hasName =
     values.firstName.trim().length > 0 ||
     values.fullName.trim().length > 0;
+  // Keep in sync with apps/api/lib/validation/account.ts addressSchema mins
   return (
     hasName &&
-    values.street.trim().length > 0 &&
-    values.city.trim().length > 0 &&
-    values.zipCode.trim().length > 0
+    values.street.trim().length >= 5 &&
+    values.city.trim().length >= 2 &&
+    values.zipCode.trim().length >= 3 &&
+    values.country.trim().length >= 2
   );
 }
 
@@ -128,7 +130,7 @@ export default function CheckoutScreen() {
   const router = useRouter();
   const insets = useSafeAreaInsets();
   const { formatPrice } = useCurrency();
-  const { items, itemCount, subtotal, taxTotal } = useCart();
+  const { items, uniqueItemCount, subtotal, taxTotal } = useCart();
 
   const [loading, setLoading] = useState(true);
   const [savingAddress, setSavingAddress] = useState(false);
@@ -329,15 +331,23 @@ export default function CheckoutScreen() {
     try {
       const saved = await saveAddress(data, existingId);
       const refreshed = await getAddresses().catch(() => []);
-      setAddresses(refreshed);
-      setSelectedAddressId(saved.id);
-      const nextForm = addressToFormData(saved);
+      const latest =
+        refreshed.find((item) => item.id === saved.id) ??
+        saved;
+      setAddresses(refreshed.length > 0 ? refreshed : [latest]);
+      setSelectedAddressId(latest.id);
+      const nextForm = addressToFormData(latest);
       setAddressForm({
         ...nextForm,
-        email: nextForm.email || authEmail,
+        label: nextForm.label || data.label || latest.label,
+        fullName: nextForm.fullName || data.fullName,
+        firstName: nextForm.firstName || data.firstName,
+        lastName: nextForm.lastName || data.lastName,
+        email: nextForm.email || authEmail || data.email,
         phone: nextForm.phone || data.phone,
       });
       setAddressModalVisible(false);
+      setEditingAddress(null);
       showAlert(
         "Address Saved",
         existingId
@@ -345,7 +355,10 @@ export default function CheckoutScreen() {
           : "New delivery address added successfully."
       );
     } catch (error) {
-      const msg = error instanceof Error ? error.message : "Could not save address.";
+      const msg =
+        error instanceof Error && error.message.trim()
+          ? error.message
+          : "Could not save address.";
       showAlert("Error", msg);
     }
   };
@@ -366,6 +379,7 @@ export default function CheckoutScreen() {
       const payload: AddressFormData = {
         ...addressForm,
         type: "other",
+        label: addressForm.label?.trim() || "Other",
         fullName,
       };
       const saved = await upsertAddress(payload);
@@ -995,7 +1009,7 @@ export default function CheckoutScreen() {
         <View className="flex-row items-center mb-3">
           <Ionicons name="cube-outline" size={20} color="#FF9800" />
           <Text className="text-base font-bold text-black ml-2">
-            Order Items ({itemCount})
+            Order Items ({uniqueItemCount})
           </Text>
         </View>
 
@@ -1055,7 +1069,11 @@ export default function CheckoutScreen() {
       <AddressFormModal
         visible={addressModalVisible}
         address={editingAddress}
-        onClose={() => setAddressModalVisible(false)}
+        lockRecipientName={Boolean(editingAddress)}
+        onClose={() => {
+          setAddressModalVisible(false);
+          setEditingAddress(null);
+        }}
         onSave={handleSaveModalAddress}
       />
     </View>

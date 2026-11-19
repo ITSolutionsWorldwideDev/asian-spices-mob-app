@@ -97,15 +97,29 @@ async function apiRequestWithSessionRetry<T>(
   }
 }
 
+function inferAddressType(label: string): AddressType {
+  const normalized = label.trim().toLowerCase();
+  if (normalized === "office") return "office";
+  if (normalized === "home") return "home";
+  return "other";
+}
+
 function mapBackendAddress(row: BackendAddress): DeliveryAddress {
   const firstName = row.first_name?.trim() ?? "";
   const lastName = row.last_name?.trim() ?? "";
   const fullName = `${firstName} ${lastName}`.trim();
+  const label = row.label?.trim() || "Other";
+  let isShippingAddress = row.is_shipping_address ?? true;
+  let isBillingAddress = row.is_billing_address ?? true;
+  if (!isShippingAddress && !isBillingAddress) {
+    isShippingAddress = true;
+    isBillingAddress = true;
+  }
 
   return normalizeAddress({
     id: String(row.id),
-    type: "other",
-    label: row.label?.trim() || "Other",
+    type: inferAddressType(label),
+    label,
     fullName,
     firstName,
     lastName,
@@ -117,23 +131,42 @@ function mapBackendAddress(row: BackendAddress): DeliveryAddress {
     state: row.state?.trim() || "",
     zipCode: row.postal_code?.trim() || "",
     phone: row.phone?.trim() || "",
-    isShippingAddress: row.is_shipping_address ?? true,
-    isBillingAddress: row.is_billing_address ?? true,
+    isShippingAddress,
+    isBillingAddress,
     isDefault: Boolean(row.is_default),
   });
 }
 
-function toBackendPayload(data: AddressFormData) {
+function toBackendPayload(data: AddressFormData, existingLabel?: string) {
+  const isShippingAddress = Boolean(data.isShippingAddress);
+  const isBillingAddress = Boolean(data.isBillingAddress);
+  const fullName = buildFullName(data);
+  const splitName = fullName
+    ? {
+        firstName: fullName.split(/\s+/)[0] ?? "",
+        lastName: fullName.split(/\s+/).slice(1).join(" "),
+      }
+    : {
+        firstName: data.firstName.trim(),
+        lastName: data.lastName.trim(),
+      };
+
   return {
-    label: ADDRESS_LABELS[data.type],
+    label:
+      data.label?.trim() ||
+      existingLabel?.trim() ||
+      ADDRESS_LABELS[data.type],
     address_line1: data.street.trim(),
-    address_line2: data.apartment.trim(),
+    address_line2: data.apartment.trim() || undefined,
     city: data.city.trim(),
-    state: data.state.trim(),
+    state: data.state.trim() || undefined,
     postal_code: data.zipCode.trim(),
     country: data.country.trim(),
-    is_shipping_address: Boolean(data.isShippingAddress),
-    is_billing_address: Boolean(data.isBillingAddress),
+    first_name: splitName.firstName || undefined,
+    last_name: splitName.lastName || undefined,
+    phone: data.phone.trim() || undefined,
+    is_shipping_address: isShippingAddress || !isBillingAddress,
+    is_billing_address: isBillingAddress || !isShippingAddress,
   };
 }
 
@@ -180,10 +213,12 @@ export async function upsertAddress(data: AddressFormData): Promise<DeliveryAddr
   const addresses = await getAddresses();
   const existingIndex = addresses.findIndex((item) => item.type === data.type);
   const existing = existingIndex >= 0 ? addresses[existingIndex] : null;
-  const address: DeliveryAddress = {
+  const label =
+    data.label?.trim() || existing?.label?.trim() || ADDRESS_LABELS[data.type];
+  const fallbackAddress: DeliveryAddress = {
     id: existing?.id ?? `addr-${data.type}`,
     type: data.type,
-    label: ADDRESS_LABELS[data.type],
+    label,
     fullName: buildFullName(data, existing?.fullName ?? ""),
     firstName: data.firstName.trim(),
     lastName: data.lastName.trim(),
@@ -201,19 +236,16 @@ export async function upsertAddress(data: AddressFormData): Promise<DeliveryAddr
   };
 
   if (existing?.id) {
-    const response = await apiRequestWithSessionRetry<BackendAddressWriteResponse>(
+    await apiRequestWithSessionRetry<BackendAddressWriteResponse>(
       `/api/account/addresses/${encodeURIComponent(existing.id)}`,
       {
         method: "PUT",
-        body: toBackendPayload(data),
+        body: toBackendPayload(data, existing.label),
       }
     );
-    if (response.address) {
-      return mapBackendAddress(response.address);
-    }
 
     const refreshed = await getAddresses();
-    return refreshed.find((item) => item.id === existing.id) ?? address;
+    return refreshed.find((item) => item.id === existing.id) ?? fallbackAddress;
   }
 
   await apiRequestWithSessionRetry<BackendAddressWriteResponse>("/api/account/addresses", {
@@ -221,7 +253,7 @@ export async function upsertAddress(data: AddressFormData): Promise<DeliveryAddr
     body: toBackendPayload(data),
   });
   const refreshed = await getAddresses();
-  return findMatchingAddress(refreshed, data) ?? refreshed[0] ?? address;
+  return findMatchingAddress(refreshed, data) ?? refreshed[0] ?? fallbackAddress;
 }
 
 export async function saveAddress(
@@ -233,11 +265,13 @@ export async function saveAddress(
     ? addresses.findIndex((item) => item.id === existingId)
     : -1;
   const existing = existingIndex >= 0 ? addresses[existingIndex] : null;
+  const label =
+    data.label?.trim() || existing?.label?.trim() || ADDRESS_LABELS[data.type];
 
-  const address: DeliveryAddress = {
+  const fallbackAddress: DeliveryAddress = {
     id: existingId ?? `addr-${Date.now()}`,
     type: data.type,
-    label: ADDRESS_LABELS[data.type],
+    label,
     fullName: buildFullName(data, existing?.fullName ?? ""),
     firstName: data.firstName.trim(),
     lastName: data.lastName.trim(),
@@ -259,22 +293,31 @@ export async function saveAddress(
       `/api/account/addresses/${encodeURIComponent(existingId)}`,
       {
         method: "PUT",
-        body: toBackendPayload(data),
+        body: toBackendPayload(data, existing?.label),
       }
     );
-    if (response.address) {
-      return mapBackendAddress(response.address);
-    }
+
     const refreshed = await getAddresses();
-    return refreshed.find((item) => item.id === existingId) ?? address;
+    const fromRefresh = refreshed.find((item) => item.id === existingId);
+    if (fromRefresh) return fromRefresh;
+    if (response.address) return mapBackendAddress(response.address);
+    return fallbackAddress;
   }
 
-  await apiRequestWithSessionRetry<BackendAddressWriteResponse>("/api/account/addresses", {
-    method: "POST",
-    body: toBackendPayload(data),
-  });
+  const response = await apiRequestWithSessionRetry<BackendAddressWriteResponse>(
+    "/api/account/addresses",
+    {
+      method: "POST",
+      body: toBackendPayload(data),
+    }
+  );
+
   const refreshed = await getAddresses();
-  return findMatchingAddress(refreshed, data) ?? refreshed[0] ?? address;
+  if (response.address) {
+    const mapped = mapBackendAddress(response.address);
+    return refreshed.find((item) => item.id === mapped.id) ?? mapped;
+  }
+  return findMatchingAddress(refreshed, data) ?? refreshed[0] ?? fallbackAddress;
 }
 
 export async function deleteAddress(id: string): Promise<void> {

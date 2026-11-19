@@ -106,7 +106,7 @@ export default function DrawerMenu() {
   const { isOpen, closeDrawer } = useMenuDrawer();
   const router = useRouter();
   const insets = useSafeAreaInsets();
-  const { itemCount, resetLocalCart } = useCart();
+  const { uniqueItemCount, resetLocalCart } = useCart();
   const { resetLocalWishlist } = useWishlist();
   const [healthyExpanded, setHealthyExpanded] = useState(false);
   const [loggingOut, setLoggingOut] = useState(false);
@@ -205,7 +205,7 @@ export default function DrawerMenu() {
               <MenuRow
                 key={item.id}
                 item={item}
-                badge={item.id === "cart" ? itemCount : undefined}
+                badge={item.id === "cart" ? uniqueItemCount : undefined}
                 onPress={() => item.route && navigate(item.route)}
               />
             ))}

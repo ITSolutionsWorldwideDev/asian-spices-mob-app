@@ -57,8 +57,17 @@ export async function POST(req: Request) {
   const parsed = addressSchema.safeParse(body);
 
   if (!parsed.success) {
+    const fieldErrors = parsed.error.flatten().fieldErrors;
+    const firstFieldError = Object.values(fieldErrors)
+      .flat()
+      .find((message): message is string => Boolean(message));
     return NextResponse.json(
-      { error: parsed.error.flatten() },
+      {
+        error:
+          firstFieldError ||
+          parsed.error.issues[0]?.message ||
+          "Invalid address",
+      },
       { status: 400 },
     );
   }
@@ -117,6 +126,7 @@ export async function POST(req: Request) {
         is_billing_address
       )
       VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12)
+      RETURNING id
       `,
       [
         null,
@@ -137,11 +147,43 @@ export async function POST(req: Request) {
       ],
     );
 
+    const firstName = data.first_name?.trim();
+    const lastName = data.last_name?.trim();
+    const phone = data.phone?.trim();
+
+    if (firstName || lastName || phone) {
+      await client.query(
+        `
+        UPDATE store_customers
+        SET
+          first_name = COALESCE(NULLIF($1, ''), first_name),
+          last_name = COALESCE(NULLIF($2, ''), last_name),
+          phone = COALESCE(NULLIF($3, ''), phone)
+        WHERE id = $4
+        `,
+        [firstName || null, lastName || null, phone || null, customer_id],
+      );
+    }
+
     await client.query("COMMIT");
+
+    const createdId = rows[0]?.id;
+    const { rows: addressRows } = createdId
+      ? await client.query(
+          `
+          SELECT a.*, c.first_name, c.last_name, c.phone
+          FROM store_customer_addresses a
+          JOIN store_customers c ON c.id = a.customer_id
+          WHERE a.id = $1
+          LIMIT 1
+          `,
+          [createdId],
+        )
+      : { rows: [] };
 
     return NextResponse.json({
       success: true,
-      address: rows[0],
+      address: addressRows[0] ?? null,
     });
   } catch (err) {
     await client.query("ROLLBACK");

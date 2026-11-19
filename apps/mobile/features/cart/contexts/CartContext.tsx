@@ -66,7 +66,10 @@ export function consolidateCartItems(items: CartItem[]): CartItem[] {
 
 type CartContextValue = {
   items: CartItem[];
+  /** Total units (sum of quantities). Used for badge totals. */
   itemCount: number;
+  /** Number of distinct products in the cart (one per product id). */
+  uniqueItemCount: number;
   subtotal: number;
   taxTotal: number;
   getItemTax: (item: CartItem) => number;
@@ -148,20 +151,34 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
     const targetId = String(product.id ?? "").trim();
     const targetKey = targetId.toLowerCase();
     const addQty = Math.max(1, Math.round(Number(quantity) || 1));
+    if (!targetKey || addQty < 1) return;
 
     setItems((current) => {
-      const existingIndex = current.findIndex(
+      const consolidated = consolidateCartItems(current);
+      const existingIndex = consolidated.findIndex(
         (item) => String(item.id ?? "").trim().toLowerCase() === targetKey
       );
+
       if (existingIndex >= 0) {
-        return current.map((item, index) =>
-          index === existingIndex
-            ? { ...item, quantity: item.quantity + addQty, price: product.price || item.price }
-            : item
+        return consolidateCartItems(
+          consolidated.map((item, index) =>
+            index === existingIndex
+              ? {
+                  ...item,
+                  quantity: item.quantity + addQty,
+                  price: product.price || item.price,
+                  name: product.name || item.name,
+                  image: product.image || item.image,
+                  weight: product.weight || item.weight,
+                  basePrice: basePrice ?? item.basePrice,
+                }
+              : item
+          )
         );
       }
-      return [
-        ...current,
+
+      return consolidateCartItems([
+        ...consolidated,
         {
           id: targetId,
           name: product.name,
@@ -171,7 +188,7 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
           price: product.price,
           quantity: addQty,
         },
-      ];
+      ]);
     });
     void addCartItemToApi(targetId, addQty, product.price).catch(() => {
       // Keep local fallback if API/session is unavailable.
@@ -181,14 +198,17 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
   const updateQuantity = useCallback((productId: string, quantity: number) => {
     if (quantity < 1) return;
     const targetKey = String(productId ?? "").trim().toLowerCase();
-    const currentItem = items.find(
+    const consolidatedCurrent = consolidateCartItems(items);
+    const currentItem = consolidatedCurrent.find(
       (item) => String(item.id ?? "").trim().toLowerCase() === targetKey
     );
     const delta = currentItem ? quantity - currentItem.quantity : 0;
 
     setItems((current) =>
-      current.map((item) =>
-        String(item.id ?? "").trim().toLowerCase() === targetKey ? { ...item, quantity } : item
+      consolidateCartItems(current).map((item) =>
+        String(item.id ?? "").trim().toLowerCase() === targetKey
+          ? { ...item, quantity }
+          : item
       )
     );
     if (delta !== 0) {
@@ -201,7 +221,9 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
   const removeItem = useCallback((productId: string) => {
     const targetKey = String(productId ?? "").trim().toLowerCase();
     setItems((current) =>
-      current.filter((item) => String(item.id ?? "").trim().toLowerCase() !== targetKey)
+      consolidateCartItems(
+        current.filter((item) => String(item.id ?? "").trim().toLowerCase() !== targetKey)
+      )
     );
     void removeCartItemFromApi(productId).catch(() => {
       // Keep local fallback if API/session is unavailable.
@@ -221,10 +243,11 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
   }, []);
 
   const replaceCartItems = useCallback(async (nextItems: CartItem[]) => {
-    setItems(nextItems);
+    const consolidated = consolidateCartItems(nextItems);
+    setItems(consolidated);
     try {
       await clearCartInApi();
-      for (const item of nextItems) {
+      for (const item of consolidated) {
         await addCartItemToApi(item.id, item.quantity, item.price);
       }
     } catch {
@@ -232,17 +255,23 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
     }
   }, []);
 
+  /** Unique products in the cart (one row per product, regardless of quantity). */
+  const uniqueItemCount = useMemo(() => consolidateCartItems(items).length, [items]);
+
+  /** Total units across all products (sum of quantities). */
   const itemCount = useMemo(
-    () => items.reduce((total, item) => total + item.quantity, 0),
+    () => consolidateCartItems(items).reduce((total, item) => total + item.quantity, 0),
     [items]
   );
+
+  const cartItems = useMemo(() => consolidateCartItems(items), [items]);
 
   const subtotal = useMemo(
-    () => items.reduce((total, item) => total + item.price * item.quantity, 0),
-    [items]
+    () => cartItems.reduce((total, item) => total + item.price * item.quantity, 0),
+    [cartItems]
   );
 
-  const taxTotal = useMemo(() => getCartTaxTotal(items, taxRules), [items, taxRules]);
+  const taxTotal = useMemo(() => getCartTaxTotal(cartItems, taxRules), [cartItems, taxRules]);
   const getItemTax = useCallback((item: CartItem) => getCartItemTax(item, taxRules), [taxRules]);
   const getItemVatPercent = useCallback(
     (item: CartItem) => getCartItemVatPercent(item, taxRules),
@@ -251,8 +280,9 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
 
   const value = useMemo(
     () => ({
-      items,
+      items: cartItems,
       itemCount,
+      uniqueItemCount,
       subtotal,
       taxTotal,
       getItemTax,
@@ -267,8 +297,9 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
       refreshCart,
     }),
     [
-      items,
+      cartItems,
       itemCount,
+      uniqueItemCount,
       subtotal,
       taxTotal,
       getItemTax,

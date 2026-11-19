@@ -325,8 +325,13 @@ export async function getHomeReels(): Promise<HomeData["reels"]> {
   }
 }
 
+let cachedTopProducts: HomeData["topProducts"] | null = null;
+let cachedNewArrivals: HomeData["newArrivals"] | null = null;
+let cachedSpecialDiscounts: HomeData["specialDiscounts"] | null = null;
+
 export async function getHomeTopProducts(): Promise<HomeData["topProducts"]> {
-  await ensureTaxRulesLoaded();
+  // Don't block product render on tax — apply VAT when rules are ready next time.
+  void ensureTaxRulesLoaded();
   try {
     const response = await apiRequest<ProductsResponse>(
       "/api/products?category=all&sort=popular&limit=6",
@@ -335,14 +340,18 @@ export async function getHomeTopProducts(): Promise<HomeData["topProducts"]> {
       cacheProductItem(item);
       return mapApiTopProduct(item, fallbackHome.topProducts[index], index);
     });
-    return products.length > 0 ? products : fallbackHome.topProducts;
+    if (products.length > 0) {
+      cachedTopProducts = products;
+      return products;
+    }
+    return cachedTopProducts ?? fallbackHome.topProducts;
   } catch {
-    return fallbackHome.topProducts;
+    return cachedTopProducts ?? fallbackHome.topProducts;
   }
 }
 
 export async function getHomeNewArrivals(): Promise<HomeData["newArrivals"]> {
-  await ensureTaxRulesLoaded();
+  void ensureTaxRulesLoaded();
   try {
     const response = await apiRequest<ProductsResponse>(
       "/api/products?category=all&sort=newest&limit=6",
@@ -351,9 +360,13 @@ export async function getHomeNewArrivals(): Promise<HomeData["newArrivals"]> {
       cacheProductItem(item);
       return mapApiNewArrivalProduct(item, fallbackHome.newArrivals[index], index);
     });
-    return products.length > 0 ? products : fallbackHome.newArrivals;
+    if (products.length > 0) {
+      cachedNewArrivals = products;
+      return products;
+    }
+    return cachedNewArrivals ?? fallbackHome.newArrivals;
   } catch {
-    return fallbackHome.newArrivals;
+    return cachedNewArrivals ?? fallbackHome.newArrivals;
   }
 }
 
@@ -367,7 +380,7 @@ export async function getHomeFeaturedRecipes(): Promise<HomeData["featuredRecipe
 }
 
 export async function getHomeSpecialDiscounts(): Promise<HomeData["specialDiscounts"]> {
-  await ensureTaxRulesLoaded();
+  void ensureTaxRulesLoaded();
   try {
     const response = await apiRequest<ProductsResponse>(
       "/api/products?category=all&sale_only=true&sort=newest&limit=5",
@@ -376,9 +389,13 @@ export async function getHomeSpecialDiscounts(): Promise<HomeData["specialDiscou
       cacheProductItem(item);
       return mapApiDiscountProduct(item, fallbackHome.specialDiscounts[index], index);
     });
-    return products.length > 0 ? products : fallbackHome.specialDiscounts;
+    if (products.length > 0) {
+      cachedSpecialDiscounts = products;
+      return products;
+    }
+    return cachedSpecialDiscounts ?? fallbackHome.specialDiscounts;
   } catch {
-    return fallbackHome.specialDiscounts;
+    return cachedSpecialDiscounts ?? fallbackHome.specialDiscounts;
   }
 }
 
